@@ -5,6 +5,8 @@
         Success,
         CompilationError,
         TimeLimitExceeded,
-        MemoryLimitExceeded
+        MemoryLimitExceeded,
+        FailedToLocateInput,
+        FailedToLocateOutput
     }
 }
