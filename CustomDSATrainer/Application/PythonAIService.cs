@@ -6,6 +6,7 @@ namespace CustomDSATrainer.Application
     public static class PythonAIService
     {
         public static string pathToPython = "AIService/main.py";
+        public static string pathToLLMPrompt = "AIService/LLMPrompt.txt";
 
         private static void RunPythonScript()
         {
@@ -22,6 +23,16 @@ namespace CustomDSATrainer.Application
             var process = new Process { StartInfo = startInfo };
             process.Start();
         }
+        public static void GenerateProblemFromPrompt(string categories)
+        {
+            string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories;
 
+            string[] lines = File.ReadAllLines(pathToLLMPrompt);
+            lines[0] = adaptedLine;
+
+            File.WriteAllLines(pathToLLMPrompt, lines);
+
+            RunPythonScript();
+        }
     }
 }

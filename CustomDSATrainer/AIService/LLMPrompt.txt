@@ -1,4 +1,4 @@
-Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: Binary Search
+Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: Dynamic programming
 
 Requirements:
 
