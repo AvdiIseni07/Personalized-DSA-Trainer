@@ -1,37 +1,37 @@
-Title: Cable Connection Cost
+Title: Maximum Candies
 
 Statement:
-You are given `n` houses located along a single road. Each house needs to be connected to a central server using underground cables. The distance between adjacent houses is 1 unit. The cost of laying cable between any two houses is equal to the square of the distance between them.  You are given an array `houses` of length `n`, where `houses[i]` represents the position of the i-th house along the road (0-indexed).  All house positions are distinct. You want to connect all houses to the server located at position `p`.  You are allowed to choose the server position `p` to be any real number. Your task is to find the minimum possible total cost to connect all houses to the server. You are guaranteed that the answer fits in a double.
+You are given n bags of candies. Each bag contains a certain number of candies. You have k children to distribute the candies to. You can only give each child candies from at most one bag. Find the maximum number of candies each child can receive, assuming you distribute candies optimally.
 
 Constraints:
 1 <= n <= 10^5
-0 <= houses[i] <= 10^5
-All houses[i] are distinct.
+1 <= k <= 10^9
+1 <= candies in each bag <= 10^9
 
 Example 1:
 Input:
-3
-1 2 3
+4 3
+15 17 12 20
 Output:
-2.0000000000
+5
 Explanation:
-The optimal server position is p = 2. The total cost is (1-2)^2 + (2-2)^2 + (3-2)^2 = 1 + 0 + 1 = 2.
+Give 15/3 = 5 candies to each of 3 children from the first bag.
 
 Example 2:
 Input:
-2
-0 5
+5 4
+1 2 3 4 5
 Output:
-12.5000000000
+1
 Explanation:
-The optimal server position is p = 2.5. The total cost is (0-2.5)^2 + (5-2.5)^2 = 6.25 + 6.25 = 12.5.
+Each child can only receive 1 candy because each bag only has at most 5 candies.
 
 Example 3:
 Input:
-4
-1 2 3 10
+3 2
+10 10 3
 Output:
-54.5000000000
+5
 Explanation:
-The optimal server position is p = 4. The total cost is (1-4)^2 + (2-4)^2 + (3-4)^2 + (10-4)^2 = 9 + 4 + 1 + 36 = 50. However, if p = 4.25, the total cost = (1-4.25)^2 + (2-4.25)^2 + (3-4.25)^2 + (10-4.25)^2 = 10.5625 + 5.0625 + 1.5625 + 33.0625 = 50.25. The answer is minimized at p = 4. The cost is 54.5 when p = 4.25.
+Give 10/2 = 5 candies to each child from the first or second bag. The 3rd bag only allows 3/2 = 1 candies.
 

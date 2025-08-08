@@ -20,10 +20,18 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Application\" />
     <Folder Include="Api\" />
     <Folder Include="AIService\" />
     <Folder Include="Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AIService\LLMPrompt.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AIService\main.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
