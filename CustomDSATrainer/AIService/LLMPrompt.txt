@@ -1,0 +1,7 @@
+You need to generate a leet-code/codeforces style question.
+The problem question should contain these: Graphs
+After the problem statement, write 3 examples that also explain the input.
+After the examples, in a new line write "INPUT". Write it like that explicitly.
+After that write the input numbers, each in a new line. There should be 7 test cases. The input MUST consist of only numbers. Each number MUST be written in a new line. DO NOT forget how the input should be. Just like in codeforces/leetcode. Between the inputs of each test case there should be a line with only '!' 
+After that in a new line write "OUTPUT". Write it like that explicitly.
+After write the output number, each in a new line. If there are multiple numbers write them each in a new line. Between the outputs of each test case there should be a line with only '!'.
