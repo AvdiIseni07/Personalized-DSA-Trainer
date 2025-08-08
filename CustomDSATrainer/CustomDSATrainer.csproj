@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Api\" />
-    <Folder Include="AIService\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 
@@ -30,6 +29,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="AIService\main.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AIService\UserOutput.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
