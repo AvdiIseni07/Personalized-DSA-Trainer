@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Api\" />
+    <Folder Include="Controllers\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

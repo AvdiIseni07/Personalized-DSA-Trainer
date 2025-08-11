@@ -1,4 +1,6 @@
 ﻿using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Persistance;
+using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Numerics;
 
@@ -26,6 +28,18 @@ namespace CustomDSATrainer.Domain
             Statement = statement;
             Difficulty = difficulty;
             Categories = categories;
+        }
+
+        public void SaveToDatabase()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite("Data Source=C:/ProgramData/MainDatabase.db");
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                context.Problem.Add(this);
+                context.SaveChanges();
+            }
         }
     }
 }
