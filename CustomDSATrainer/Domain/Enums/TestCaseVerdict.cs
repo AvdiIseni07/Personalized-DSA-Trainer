@@ -6,6 +6,7 @@
         Passed,
         IncorrectAnswer,
         TimeLimitExceeded,
+        MemoryLimitExceeded,
         TooManyArguments,
         TooFewArguments
     }

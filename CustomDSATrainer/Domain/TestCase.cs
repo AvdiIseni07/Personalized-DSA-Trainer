@@ -6,43 +6,33 @@ namespace CustomDSATrainer.Domain
     public class TestCase
     {
         public int Id { get; set; }
-        public required string PathToExecutable { get; set; }
-        public required string PathToInputFile { get; set; }
-        public required string PathToExpectedOutputFile { get; set; }  
-        public uint TimeLimit { get; set; } = 1000; // in milliseconds
+        public string PathToExecutable { get; set; }
+        public string PathToInputFile { get; set; }
+        public string PathToExpectedOutputFile { get; set; }  
+        public long TimeLimit { get; set; } = 1000; // in milliseconds
         public uint MemoryLimit { get; set; } = 64; // in MB
         public TestCaseVerdict Verdict { get; set; } = TestCaseVerdict.NoVerdict;
-        public long TimeOfStarting { get; set; } // Unix timestamp
         public decimal ExecutionTime { get; set; }
-        private UserSourceLinker _UserSourceLinker { get; set; } = new UserSourceLinker();
+        private UserSourceLinker _UserSourceLinker { get; set; } 
         private TestCaseRunner _TestCaseRunner { get; set; } = new TestCaseRunner();
         public int ProblemId { get; set; }
         public Problem Problem { get; set; }
 
-        public TestCase() { }
+        public TestCase() { _UserSourceLinker = new UserSourceLinker(this); }
         public TestCase(string pathToInputFile, uint timeLimit, uint memoryLimit)
         {
             PathToInputFile = pathToInputFile;
             TimeLimit = timeLimit;
             MemoryLimit = memoryLimit;
+            _UserSourceLinker = new UserSourceLinker(this);
         }
         
         public TestCaseVerdict InitTestCase()
         {
-            TimeOfStarting = ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
+            Verdict = _UserSourceLinker.RunCppExecutable();
 
-            _UserSourceLinker.RunCppExecutable(this.PathToExecutable, this.PathToInputFile);
-            
-            var currentVerdict = _TestCaseRunner.RunTest(PathToExpectedOutputFile);
-            if (currentVerdict == TestCaseVerdict.Passed)
-            {
-                long timeOfEnding = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
-
-                if (TimeOfStarting - timeOfEnding > TimeLimit)
-                {
-                    currentVerdict = TestCaseVerdict.TimeLimitExceeded;
-                }
-            }
+            if (Verdict == TestCaseVerdict.Passed)
+                Verdict = _TestCaseRunner.RunTest(PathToExpectedOutputFile);
 
             return Verdict;
         }

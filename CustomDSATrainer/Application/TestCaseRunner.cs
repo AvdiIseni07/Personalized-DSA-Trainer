@@ -8,7 +8,7 @@ namespace CustomDSATrainer.Application
         private string userOutputFile = "AIService/UserOutput.txt";
         public TestCaseVerdict RunTest(string expectedOutputFile)
         {
-            var verdict = TestCaseVerdict.NoVerdict;
+            TestCaseVerdict verdict = TestCaseVerdict.Passed;
 
             string[] userOutput = File.ReadAllText(userOutputFile).Split(' ');
             string[] expectedOutput = File.ReadAllText(expectedOutputFile).Split(' ');
@@ -25,8 +25,6 @@ namespace CustomDSATrainer.Application
                 return verdict;
             }
 
-            verdict = TestCaseVerdict.Passed;
-
             for (int i = 0; i < userOutput.Length; i ++)
             {
                 if (userOutput[i] != expectedOutput[i])
@@ -35,8 +33,6 @@ namespace CustomDSATrainer.Application
                     break;
                 }
             }
-
-            // WIHL: Memory limit check
 
             return verdict;
         }
