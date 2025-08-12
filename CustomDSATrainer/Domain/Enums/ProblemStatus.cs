@@ -4,6 +4,7 @@
     {
         Solved,
         Unsolved,
-        Solving
+        Solving,
+        WasSolving
     }
 }

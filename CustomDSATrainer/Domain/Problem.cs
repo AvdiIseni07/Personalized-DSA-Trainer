@@ -2,10 +2,7 @@
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using System.Collections;
-using System.Diagnostics;
-using System.Numerics;
+using CustomDSATrainer.Shared;
 
 
 namespace CustomDSATrainer.Domain
@@ -38,7 +35,7 @@ namespace CustomDSATrainer.Domain
         public void SaveToDatabase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite("Data Source=C:/ProgramData/MainDatabase.db");
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {

@@ -1,5 +1,4 @@
-﻿using Azure.Core.Pipeline;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace CustomDSATrainer.Application
 {

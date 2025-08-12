@@ -1,6 +1,10 @@
 ﻿using CustomDSATrainer.Application;
 using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Persistance;
+using CustomDSATrainer.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Controllers
 {
@@ -12,21 +16,11 @@ namespace CustomDSATrainer.Controllers
         [HttpGet("{ExePath}")]
         public IActionResult GetExePath(string ExePath)
         {
-            return Ok(ExePath);
-        }
-    }
+            SharedValues.CurrentActiveProblem.Submit(ExePath);
 
-    [ApiController]
-    [Route("api/[controller]")]
-    public class categoryController : ControllerBase
-    {
-        [HttpGet("{Categories}")]
-        public IActionResult TestProblemFromCategory(string Categories)
-        {
-            ProblemGenerator.categories = Categories;
-            Problem problem = ProblemGenerator.GenerateFromPrompt();
+            string returnMessage = (SharedValues.CurrentActiveProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
 
-            return Ok(problem);
+            return Ok(returnMessage);
         }
     }
 }
