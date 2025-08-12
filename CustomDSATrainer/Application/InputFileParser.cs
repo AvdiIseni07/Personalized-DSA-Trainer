@@ -9,7 +9,7 @@ namespace CustomDSATrainer.Application
             List<string> result = new List<string>();
 
             string text = File.ReadAllText(pathToInputFile);
-            string[] inputs = text.Split(' ');
+            string[] inputs = text.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string input in inputs)
             {

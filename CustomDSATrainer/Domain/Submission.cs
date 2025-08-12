@@ -31,8 +31,8 @@ namespace CustomDSATrainer.Domain
 
             for (int i = 1; i <= 7; i ++)
             {
-                string[] currentInput = Directory.GetFiles(PathToInput, i.ToString(), SearchOption.AllDirectories);
-                string[] currentOutput = Directory.GetFiles(PathToOutput, i.ToString(), SearchOption.AllDirectories);
+                string[] currentInput = Directory.GetFiles(PathToInput, $"{i.ToString()}.txt", SearchOption.AllDirectories);
+                string[] currentOutput = Directory.GetFiles(PathToOutput, $"{i.ToString()}.txt", SearchOption.AllDirectories);
 
                 if (currentInput.Length == 0)
                 {
@@ -66,6 +66,12 @@ namespace CustomDSATrainer.Domain
                 {
                     Result = SubmissionResult.MemoryLimitExceeded;
                     break;
+                }
+
+                if (verdict == TestCaseVerdict.IncorrectAnswer)
+                {
+                  Result = SubmissionResult.Failed;
+                  break;
                 }
             }
         }

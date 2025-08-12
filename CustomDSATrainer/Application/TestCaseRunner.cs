@@ -10,8 +10,8 @@ namespace CustomDSATrainer.Application
         {
             TestCaseVerdict verdict = TestCaseVerdict.Passed;
 
-            string[] userOutput = File.ReadAllText(userOutputFile).Split(' ');
-            string[] expectedOutput = File.ReadAllText(expectedOutputFile).Split(' ');
+            string[] userOutput = File.ReadAllText(userOutputFile).Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] expectedOutput = File.ReadAllText(expectedOutputFile).Split(new[] {' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
             if (userOutput.Length < expectedOutput.Length)
             {

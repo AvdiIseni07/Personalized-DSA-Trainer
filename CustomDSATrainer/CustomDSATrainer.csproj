@@ -24,10 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="AIService\LLMPrompt.txt">
+    <None Update="AIService\ProblemLLMPrompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="AIService\main.py">
+    <None Update="AIService\ProblemGenerartor.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AIService\Task\Inputs\1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AIService\Task\Outputs\1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="AIService\Task\Statement.txt">

@@ -4,8 +4,8 @@ namespace CustomDSATrainer.Application
 {
     public static class PythonAIService
     {
-        public static string pathToPython = "AIService/main.py";
-        public static string pathToLLMPrompt = "AIService/LLMPrompt.txt";
+        public static string pathToPython = "AIService/ProblemGenerator.py";
+        public static string pathToLLMPrompt = "AIService/ProblemLLMPrompt.txt";
 
         private static void RunPythonScript()
         {
