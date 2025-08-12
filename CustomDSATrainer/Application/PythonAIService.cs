@@ -22,15 +22,16 @@ namespace CustomDSATrainer.Application
 
             var process = new Process { StartInfo = startInfo };
             process.Start();
+            process.WaitForExit();
         }
         public static void GenerateProblemFromPrompt(string categories)
         {
             string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories;
 
-            string[] lines = File.ReadAllLines(pathToLLMPrompt);
+            string[] lines = File.ReadAllLines(Path.GetFullPath(pathToLLMPrompt));
             lines[0] = adaptedLine;
 
-            File.WriteAllLines(pathToLLMPrompt, lines);
+            File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
 
             RunPythonScript();
         }

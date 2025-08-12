@@ -1,72 +1,75 @@
+import os
 from google import genai
 from dotenv import load_dotenv
-import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 load_dotenv()
 
 gemini_api_key = os.getenv("API_KEY")
-client = genai.Client(api_key = gemini_api_key)
-question = ""
+client = genai.Client(api_key=gemini_api_key)
 
-with open('LLMPrompt.txt', 'r', encoding='utf-8') as file:
+prompt_path = os.path.join(BASE_DIR, 'LLMPrompt.txt')
+with open(prompt_path, 'r', encoding='utf-8') as file:
     question = file.read()
 
 response = client.models.generate_content(
-    model = "gemini-2.0-flash", contents = question
+    model="gemini-2.0-flash",
+    contents=question
 )
 
-print(response.text)
 lines = response.text.splitlines()
 
 inputStarted = False
 outputStarted = False
-
 statement = ""
-input = ""
-output = ""
-
+input_data = ""
+output_data = ""
 currentInput = 1
 currentOutput = 1
 
 for line in lines:
-    if inputStarted == False:
+    if not inputStarted:
         if line == 'INPUT':
             inputStarted = True
             continue
         else:
-            statement += line
-            statement += '\n'
-    elif outputStarted == False:
+            statement += line + '\n'
+    elif not outputStarted:
         if line == 'OUTPUT':
             outputStarted = True
-            nameOfFile = "Task/Inputs/" + str(currentInput)
-            with open(nameOfFile, 'w') as f:
-                f.write(input)
+            input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", str(currentInput))
+            os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
+            with open(input_file_path, 'w') as f:
+                f.write(input_data)
             continue
         else:
             if line == '!':
-                nameOfFile = "Task/Inputs/" + str(currentInput)
-                with open(nameOfFile, 'w') as f:
-                    f.write(input)
-                    input = ""
+                input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", str(currentInput))
+                os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
+                with open(input_file_path, 'w') as f:
+                    f.write(input_data)
+                input_data = ""
                 currentInput += 1
             else:
-                input += line
-                input += '\n'
+                input_data += line + '\n'
     else:
         if line == '!':
-            nameOfFile = "Task/Outputs/" + str(currentOutput)
-            with open(nameOfFile, 'w') as f:
-                    f.write(output)
-                    output = ""
+            output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", str(currentOutput))
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+            with open(output_file_path, 'w') as f:
+                f.write(output_data)
+            output_data = ""
             currentOutput += 1
         else:
-            output += line
-            output += '\n'
+            output_data += line + '\n'
 
-nameOfFile = "Task/Outputs/" + str(currentOutput)
-with open(nameOfFile, 'w') as f:
-    f.write(output)
-        
-with open('Task/Statement.txt', 'w') as statementFile:
+output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", str(currentOutput))
+os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+with open(output_file_path, 'w') as f:
+    f.write(output_data)
+
+statement_path = os.path.join(BASE_DIR, 'Task', 'Statement.txt')
+os.makedirs(os.path.dirname(statement_path), exist_ok=True)
+with open(statement_path, 'w') as statementFile:
     statementFile.write(statement)

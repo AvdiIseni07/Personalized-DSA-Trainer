@@ -1,6 +1,8 @@
 ﻿using CustomDSATrainer.Application;
 using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Persistance;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing.Text;
 
 namespace CustomDSATrainer.Domain
@@ -25,18 +27,20 @@ namespace CustomDSATrainer.Domain
 
         public void RunSumbission()
         {
+            Result = SubmissionResult.Success;
+
             for (int i = 1; i <= 7; i ++)
             {
                 string[] currentInput = Directory.GetFiles(PathToInput, i.ToString(), SearchOption.AllDirectories);
                 string[] currentOutput = Directory.GetFiles(PathToOutput, i.ToString(), SearchOption.AllDirectories);
 
-                if (currentInput.Length != 1)
+                if (currentInput.Length == 0)
                 {
                     Result = SubmissionResult.FailedToLocateInput;
                     return; 
                 }
 
-                if (currentOutput.Length != 1)
+                if (currentOutput.Length == 0)
                 {
                     Result = SubmissionResult.FailedToLocateOutput;
                     return;
@@ -51,9 +55,18 @@ namespace CustomDSATrainer.Domain
                 };
 
                 TestCaseVerdict verdict = testCase.InitTestCase();
-
-                if (verdict != TestCaseVerdict.Passed)
+                    
+                if (verdict == TestCaseVerdict.TimeLimitExceeded)
+                {
+                    Result = SubmissionResult.TimeLimitExceeded;
                     break;
+                }
+
+                if (verdict == TestCaseVerdict.MemoryLimitExceeded)
+                {
+                    Result = SubmissionResult.MemoryLimitExceeded;
+                    break;
+                }
             }
         }
     }
