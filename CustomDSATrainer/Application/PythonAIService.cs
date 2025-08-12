@@ -34,5 +34,17 @@ namespace CustomDSATrainer.Application
 
             RunPythonScript();
         }
+        public static void GenerateProblemFromUnsolved(string categories)
+        {
+            string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories
+                                + ". You do not have to use all of them. Use what you think would make the most interesting problem and would help the user the most.";
+
+            string[] lines = File.ReadAllLines(Path.GetFullPath(pathToLLMPrompt));
+            lines[0] = adaptedLine;
+
+            File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
+
+            RunPythonScript();
+        }
     }
 }
