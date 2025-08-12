@@ -1,4 +1,4 @@
-Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: first grade adittion a+ b
+Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: 1st grade addition a + b
 
 Requirements:
 

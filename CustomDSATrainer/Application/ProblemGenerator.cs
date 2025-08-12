@@ -13,6 +13,7 @@ namespace CustomDSATrainer.Application
         public static string pathToStatement = "AIService/Task/Statement.txt";
         private static string pathToInput = "AIService/Task/Inputs";
         private static string pathToOutput = "AIService/Task/Outputs";
+        private static Random random = new Random();
 
         private static Problem InitProblem(string categories)
         {
@@ -95,6 +96,27 @@ namespace CustomDSATrainer.Application
 
                     PythonAIService.GenerateProblemFromUnsolved(prompt);
                     generatedProblem = InitProblem(prompt);
+                }
+            }
+
+            return generatedProblem;
+        }
+
+        public static Problem? Revision()
+        {
+            Problem? generatedProblem = null;
+
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                var results = context.Problem.Where(p => p.Status == ProblemStatus.Solved).ToList();
+
+                if (results.Count > 0)
+                {
+                    int chosenProblem = random.Next(0, results.Count);
+                    generatedProblem = results[chosenProblem];
                 }
             }
 
