@@ -45,12 +45,33 @@ namespace CustomDSATrainer.Controllers
 
             if (problem != null)
             {
-                LoadProblemController controller = new LoadProblemController();
-                controller.LoadProblem(problem.Id);
+                LoadProblemController loadProblemController = new LoadProblemController();
+                loadProblemController.LoadProblem(problem.Id);
 
-                return Ok($"Selected problem with id: {problem.Id} for revision ");
+                return Ok($"Selected problem with id: {problem.Id} for revision");
             }
             return BadRequest();
+        }
+    }
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RevisionWithCategoriesController : ControllerBase
+    {
+        [HttpGet("{Categories}")]
+        public IActionResult RevisionWithCategories(string Categories)
+        {
+            Problem? problem = ProblemGenerator.RevisionWithCategories(Categories);
+
+            if (problem != null)
+            {
+                LoadProblemController loadProblemController = new LoadProblemController();
+                loadProblemController.LoadProblem(problem.Id);
+
+                return Ok($"Selected problem with id: {problem.Id} for revision");
+            }
+            else
+                return BadRequest();
         }
     }
 }

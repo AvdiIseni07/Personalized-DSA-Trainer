@@ -122,5 +122,26 @@ namespace CustomDSATrainer.Application
 
             return generatedProblem;
         }
+ 
+        public static Problem? RevisionWithCategories(string categories)
+        {
+            Problem? generatedProblem = null;
+
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                var results = context.Problem.Where(p => p.Categories.Contains(categories)).ToList();
+
+                if (results.Count > 0)
+                {
+                    int chosenProblem = random.Next(0, results.Count);
+                    generatedProblem = results[chosenProblem];
+                }
+            }
+
+            return generatedProblem;
+        }
     }
 }
