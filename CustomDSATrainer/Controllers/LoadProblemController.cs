@@ -37,6 +37,24 @@ namespace CustomDSATrainer.Controllers
                         SharedValues.CurrentActiveProblem.SaveToDatabase();
                     }
 
+                    string[] inputs = problem.Inputs.Split('!');
+                    string[] outputs = problem.Outputs.Split('!');
+
+                    for (int i = 1; i <= 7; i ++)
+                    {
+                        var currentInput = Directory.GetFiles("AIService/Task/Inputs", $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
+                        var currentOutput = Directory.GetFiles("AIService/Task/Outputs", $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
+
+                        if (inputs[i - 1].StartsWith('\n'))
+                            inputs[i - 1].Remove(0, 1);
+
+                        if (outputs[i - 1].StartsWith('\n'))
+                            outputs[i - 1].Remove(0, 1);
+
+                        System.IO.File.WriteAllText(currentInput, inputs[i - 1]);
+                        System.IO.File.WriteAllText(currentOutput, outputs[i - 1]);
+                    }
+
                     return Ok($"The following problem was retrieved succesfully.\n\n{SharedValues.CurrentActiveProblem.Statement}");
                 }
             }
