@@ -1,5 +1,8 @@
 ﻿using CustomDSATrainer.Application;
 using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Persistance;
+using CustomDSATrainer.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
 {
@@ -15,8 +18,8 @@ namespace CustomDSATrainer.Domain
         public decimal ExecutionTime { get; set; }
         private UserSourceLinker _UserSourceLinker { get; set; } 
         private TestCaseRunner _TestCaseRunner { get; set; } = new TestCaseRunner();
-        public int ProblemId { get; set; }
-        public Problem Problem { get; set; }
+        public int SubmissionId { get; set; }
+        public Submission Submission { get; set; }
 
         public TestCase() { _UserSourceLinker = new UserSourceLinker(this); }
         public TestCase(string pathToInputFile, uint timeLimit, uint memoryLimit)
@@ -27,6 +30,27 @@ namespace CustomDSATrainer.Domain
             _UserSourceLinker = new UserSourceLinker(this);
         }
         
+        public void SaveToDatabase()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                var existingTestCase = context.TestCase.Find(this.Id);
+
+                if (existingTestCase == null)
+                {
+                    context.TestCase.Add(this);
+                }
+                else
+                {
+                    context.Entry(existingTestCase).CurrentValues.SetValues(this);
+                }
+
+                context.SaveChanges();
+            }
+        }
         public TestCaseVerdict InitTestCase()
         {
             Verdict = _UserSourceLinker.RunCppExecutable();

@@ -1,1 +1,1 @@
-Use the + operator.
+Use Depth First Search (DFS) to explore all paths from the root.

@@ -61,9 +61,9 @@ namespace CustomDSATrainer.Persistance
             modelBuilder.Entity<Problem>().HasData(LeetcodeKaggleDataset.ToArray());*/
 
             modelBuilder.Entity<TestCase>()
-                .HasOne(tc => tc.Problem)
-                .WithMany(p => p.TestCases)
-                .HasForeignKey(tc => tc.ProblemId)
+                .HasOne(tc => tc.Submission)
+                .WithMany(s => s.TestCases)
+                .HasForeignKey(tc => tc.SubmissionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Submission>()

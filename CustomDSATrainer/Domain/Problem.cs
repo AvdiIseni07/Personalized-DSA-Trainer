@@ -22,7 +22,6 @@ namespace CustomDSATrainer.Domain
         public string? Inputs { get; set; } = string.Empty;
         public string? Outputs { get; set; } = string.Empty;
       
-        public ICollection<TestCase> TestCases { get; set; } = new List<TestCase>();
         public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
         public ICollection<AIReview> AIReviews { get; set; } = new List<AIReview>();
         public Problem()
@@ -60,8 +59,10 @@ namespace CustomDSATrainer.Domain
 
         public void Submit(string pathToExe)
         {
-            Submission submission = new Submission { PathToExecutable = pathToExe, ProblemId = Id, Problem = this};
+            Submission submission = new Submission { ProblemId = this.Id, Id = 0, PathToExecutable = pathToExe};
+            submission.SaveToDatabase();
             submission.RunSumbission();
+            submission.SaveToDatabase();
 
             if (submission.Result == SubmissionResult.Success)
                 this.Status = ProblemStatus.Solved;
