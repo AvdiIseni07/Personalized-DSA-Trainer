@@ -22,19 +22,27 @@ lines = response.text.splitlines()
 
 inputStarted = False
 outputStarted = False
+hintFound = False
 statement = ""
 input_data = ""
 output_data = ""
+hint = ""
 currentInput = 1
 currentOutput = 1
 
 for line in lines:
-    if not inputStarted:
+    if not hintFound:
+        if line == 'HINT':
+            hintFound = True
+            continue
+        else:
+            statement += line + '\n'
+    elif not inputStarted:
         if line == 'INPUT':
             inputStarted = True
             continue
         else:
-            statement += line + '\n'
+            hint += line
     elif not outputStarted:
         if line == 'OUTPUT':
             outputStarted = True
@@ -73,3 +81,8 @@ statement_path = os.path.join(BASE_DIR, 'Task', 'Statement.txt')
 os.makedirs(os.path.dirname(statement_path), exist_ok=True)
 with open(statement_path, 'w') as statementFile:
     statementFile.write(statement)
+
+hint_path = os.path.join(BASE_DIR, 'Task', 'Hint.txt')
+os.makedirs(os.path.dirname(hint_path), exist_ok=True)
+with open(hint_path, 'w') as hintFile:
+    hintFile.write(hint)

@@ -13,15 +13,18 @@ namespace CustomDSATrainer.Application
         public static string pathToStatement = "AIService/Task/Statement.txt";
         private static string pathToInput = "AIService/Task/Inputs";
         private static string pathToOutput = "AIService/Task/Outputs";
+        private static string pathToHint = "AIService/Task/Hint.txt";
         private static Random random = new Random();
 
         private static Problem InitProblem(string categories)
         {
             string statement = File.ReadAllText(Path.GetFullPath(pathToStatement));
             string title = File.ReadAllLines(Path.GetFullPath(pathToStatement))[0];
+            string hint = File.ReadAllText(Path.GetFullPath(pathToHint));
 
             title = title.Remove(0, 7);
             statement = statement.Remove(0, 7);
+            
 
             Problem problem = new Problem
             {
@@ -29,7 +32,8 @@ namespace CustomDSATrainer.Application
                 Title = title,
                 Statement = statement,
                 Difficulty = difficulty,
-                Categories = categories
+                Categories = categories,
+                Hint = hint
             };
 
             for (int i = 1; i <= 7; i++)

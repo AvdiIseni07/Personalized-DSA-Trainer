@@ -16,7 +16,8 @@ namespace CustomDSATrainer.Domain
         public string? Title { get; set; }
         public string? Statement { get; set; }
         public string? Difficulty { get; set; }
-        public string?Categories { get; set; } // "category1,category2"
+        public string? Categories { get; set; } // "category1,category2"
+        public string? Hint { get; set; }
         public ProblemStatus Status { get; set; } = ProblemStatus.Unsolved;
         public string? Inputs { get; set; } = string.Empty;
         public string? Outputs { get; set; } = string.Empty;

@@ -1,4 +1,4 @@
-Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: binary index tree
+Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: 1st grade addition a + b, a <5, b < 5
 
 Requirements:
 
@@ -7,6 +7,9 @@ Requirements:
 * Give the problem a concise title.
 * Describe the problem clearly: what you’re given, what you must compute, and any special algorithm twist (for example, “minimum spanning tree,” “shortest path with constraints,” etc.).
 * State all input parameters and constraints (limits on n, m, weight ranges, directed/undirected, connectedness, etc.).
+
+2. One hint
+   Give one hint that you think might help the user if they are stuck somewhere.
 
 2. Examples (3 total)
    For each example, show:
@@ -76,6 +79,9 @@ Output:
 12
 Explanation:
 Best path is 1=>2=>5 = 2+10 = 12.
+
+HINT
+Consider going from the bottom up.
 
 INPUT
 4 4
