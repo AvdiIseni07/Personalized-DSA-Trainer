@@ -21,6 +21,6 @@ response = client.models.generate_content(
 text = response.text
 print(text)
 
-resultPath = "CodeReview/Result.txt"
+resultPath = os.path.join(BASE_DIR, 'CodeReview/Result.txt')
 with open(resultPath, 'w') as file:
     file.write(text)
