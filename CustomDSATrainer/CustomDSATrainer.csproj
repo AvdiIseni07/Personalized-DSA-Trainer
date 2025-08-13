@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AIService\CodeReview\Prompts\" />
     <Folder Include="Api\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
@@ -27,7 +28,7 @@
     <None Update="AIService\ProblemLLMPrompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="AIService\ProblemGenerartor.py">
+    <None Update="AIService\ProblemGenerator.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="AIService\Task\Inputs\1.txt">

@@ -1,0 +1,8 @@
+Flaws:
+- Incorrect output: The code subtracts `b` from `a` instead of adding them.
+
+Improvements:
+1. Change `std::cout << a - b;` to `std::cout << a + b;` to perform addition.
+
+LINKS
+N/A (This is a basic arithmetic error)

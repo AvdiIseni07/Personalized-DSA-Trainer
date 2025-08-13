@@ -3,6 +3,9 @@ using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
 using CustomDSATrainer.Shared;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Localization;
+using CustomDSATrainer.Application;
 
 
 namespace CustomDSATrainer.Domain
@@ -56,7 +59,7 @@ namespace CustomDSATrainer.Domain
 
         public void Submit(string pathToExe)
         {
-            Submission submission = new Submission { PathToExecutable = pathToExe, ProblemId = Id };
+            Submission submission = new Submission { PathToExecutable = pathToExe, ProblemId = Id, Problem = this};
             submission.RunSumbission();
 
             if (submission.Result == SubmissionResult.Success)
@@ -65,6 +68,18 @@ namespace CustomDSATrainer.Domain
                 this.Status = ProblemStatus.Unsolved;
 
             this.SaveToDatabase();
+        }
+        private string pathToAIReviewResult = "AIService/CodeReview/Result.txt";
+        public string? AiReview(string pathToSource)
+        {
+            AIReview currentReview = new AIReview {ProblemId = this.Id, PathToCPPFile = pathToSource, ProblemStatus = this.Status };
+
+            CodeReviewer.ReviewUnsolvedProblem(pathToSource);
+            currentReview.Review = File.ReadAllText(Path.GetFullPath(pathToAIReviewResult));
+
+            currentReview.SaveToDatabase();
+
+            return currentReview.Review;
         }
     }
 }

@@ -9,7 +9,7 @@ load_dotenv()
 gemini_api_key = os.getenv("API_KEY")
 client = genai.Client(api_key=gemini_api_key)
 
-prompt_path = os.path.join(BASE_DIR, 'LLMPrompt.txt')
+prompt_path = os.path.join(BASE_DIR, 'ProblemLLMPrompt.txt')
 with open(prompt_path, 'r', encoding='utf-8') as file:
     question = file.read()
 
@@ -38,14 +38,14 @@ for line in lines:
     elif not outputStarted:
         if line == 'OUTPUT':
             outputStarted = True
-            input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", str(currentInput))
+            input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", f"{currentInput}.txt")
             os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
             with open(input_file_path, 'w') as f:
                 f.write(input_data)
             continue
         else:
             if line == '!':
-                input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", str(currentInput))
+                input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", f"{currentInput}.txt")
                 os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
                 with open(input_file_path, 'w') as f:
                     f.write(input_data)
@@ -55,7 +55,7 @@ for line in lines:
                 input_data += line + '\n'
     else:
         if line == '!':
-            output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", str(currentOutput))
+            output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", f"{currentOutput}.txt")
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
             with open(output_file_path, 'w') as f:
                 f.write(output_data)
@@ -64,7 +64,7 @@ for line in lines:
         else:
             output_data += line + '\n'
 
-output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", str(currentOutput))
+output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", f"{currentOutput}.txt")
 os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
 with open(output_file_path, 'w') as f:
     f.write(output_data)

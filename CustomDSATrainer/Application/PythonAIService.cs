@@ -4,15 +4,17 @@ namespace CustomDSATrainer.Application
 {
     public static class PythonAIService
     {
-        public static string pathToPython = "AIService/ProblemGenerator.py";
+        public static string pathToPythonProblemGen = "AIService/ProblemGenerator.py";
+        public static string pathToPythonUnsolvedReview = "AIService/UnsolvedCodeReviewer.py";
+        
         public static string pathToLLMPrompt = "AIService/ProblemLLMPrompt.txt";
 
-        private static void RunPythonScript()
+        private static void RunPythonScript(string script)
         {
             var startInfo = new ProcessStartInfo
             {
                 FileName = "python",
-                Arguments = $"-u \"{Path.GetFullPath(pathToPython)}\"",
+                Arguments = $"-u \"{Path.GetFullPath(script)}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -32,7 +34,7 @@ namespace CustomDSATrainer.Application
 
             File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
 
-            RunPythonScript();
+            RunPythonScript(pathToPythonProblemGen);
         }
         public static void GenerateProblemFromUnsolved(string categories)
         {
@@ -44,7 +46,12 @@ namespace CustomDSATrainer.Application
 
             File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
 
-            RunPythonScript();
+            RunPythonScript(pathToPythonProblemGen);
+        }
+
+        public static void ReviewUnsolvedPrompt()
+        {
+            RunPythonScript(pathToPythonUnsolvedReview);
         }
     }
 }

@@ -1,4 +1,4 @@
-Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: a - b
+Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: binary index tree
 
 Requirements:
 

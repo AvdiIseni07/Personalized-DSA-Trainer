@@ -34,8 +34,8 @@ namespace CustomDSATrainer.Application
 
             for (int i = 1; i <= 7; i++)
             {
-                var inputFile = Directory.GetFiles(pathToInput, i.ToString(), SearchOption.AllDirectories)[0];
-                var outputFile = Directory.GetFiles(pathToOutput, i.ToString(), SearchOption.AllDirectories)[0];
+                var inputFile = Directory.GetFiles(pathToInput, $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
+                var outputFile = Directory.GetFiles(pathToOutput, $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
 
                 if (problem.Inputs != string.Empty)
                     problem.Inputs += "!\n";
