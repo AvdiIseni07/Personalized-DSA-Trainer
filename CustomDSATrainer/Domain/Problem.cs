@@ -74,7 +74,11 @@ namespace CustomDSATrainer.Domain
         {
             AIReview currentReview = new AIReview {ProblemId = this.Id, PathToCPPFile = pathToSource, ProblemStatus = this.Status };
 
-            CodeReviewer.ReviewUnsolvedProblem(pathToSource);
+            if (this.Status != ProblemStatus.Solved)
+                CodeReviewer.ReviewUnsolvedProblem(pathToSource);
+            else
+                CodeReviewer.ReviewSolvedProblem(pathToSource);
+
             currentReview.Review = File.ReadAllText(Path.GetFullPath(pathToAIReviewResult));
 
             currentReview.SaveToDatabase();

@@ -6,7 +6,7 @@ namespace CustomDSATrainer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ReviewUnsolvedProblemController : ControllerBase
+    public class ReviewProblemController : ControllerBase
     {
         [HttpGet("{SourceCodePath}")]
         public IActionResult ReviewUnsolvedProblem(string SourceCodePath)

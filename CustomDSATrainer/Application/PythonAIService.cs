@@ -6,6 +6,7 @@ namespace CustomDSATrainer.Application
     {
         public static string pathToPythonProblemGen = "AIService/ProblemGenerator.py";
         public static string pathToPythonUnsolvedReview = "AIService/UnsolvedCodeReviewer.py";
+        private static string pathToPythonSolvedReview = "AIService/SolvedCodeReviewer.py";
         
         public static string pathToLLMPrompt = "AIService/ProblemLLMPrompt.txt";
 
@@ -52,6 +53,11 @@ namespace CustomDSATrainer.Application
         public static void ReviewUnsolvedPrompt()
         {
             RunPythonScript(pathToPythonUnsolvedReview);
+        }
+
+        public static void ReviewSolvedPromblem()
+        {
+            RunPythonScript(pathToPythonSolvedReview);
         }
     }
 }

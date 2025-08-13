@@ -19,12 +19,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AIService\CodeReview\Prompts\" />
+    <Folder Include="AIService\CodeReview\Templates\" />
     <Folder Include="Api\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="AIService\CodeReview\Prompts\Prompt-Solved.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AIService\CodeReview\Prompts\Prompt-Unsolved.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="AIService\ProblemLLMPrompt.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
