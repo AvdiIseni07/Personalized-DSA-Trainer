@@ -5,6 +5,7 @@
         Solved,
         Unsolved,
         Solving,
-        WasSolving
+        WasSolving,
+        NotTried
     }
 }

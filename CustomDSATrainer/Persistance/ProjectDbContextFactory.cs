@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CustomDSATrainer.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace CustomDSATrainer.Persistance
@@ -9,7 +10,7 @@ namespace CustomDSATrainer.Persistance
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
 
-            optionsBuilder.UseSqlite("Data Source=C:/ProgramData/MainDatabase.db");
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
 
             return new ProjectDbContext(optionsBuilder.Options);
         }

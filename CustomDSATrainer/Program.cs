@@ -29,4 +29,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+UserHandler.InitUser();
+ActivityLogger.LogToday();
+
 app.Run();
+
+

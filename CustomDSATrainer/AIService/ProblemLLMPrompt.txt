@@ -1,4 +1,4 @@
-Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: Trees, 1st addition a + b,  a<5,  b < 5. You do not have to use all of them. Use what you think would make the most interesting problem and would help the user the most.
+Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: graphs
 
 Requirements:
 

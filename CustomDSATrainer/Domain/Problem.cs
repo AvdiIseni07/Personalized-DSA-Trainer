@@ -18,7 +18,7 @@ namespace CustomDSATrainer.Domain
         public string? Difficulty { get; set; }
         public string? Categories { get; set; } // "category1,category2"
         public string? Hint { get; set; }
-        public ProblemStatus Status { get; set; } = ProblemStatus.Unsolved;
+        public ProblemStatus Status { get; set; } = ProblemStatus.NotTried;
         public string? Inputs { get; set; } = string.Empty;
         public string? Outputs { get; set; } = string.Empty;
       
@@ -64,9 +64,42 @@ namespace CustomDSATrainer.Domain
             submission.RunSumbission();
             submission.SaveToDatabase();
 
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                var user = context.UserProgress.FirstOrDefault(u => u.Id == 1);
+
+                if (user != null)
+                {
+                    if (this.Status == ProblemStatus.NotTried)
+                    {
+                        if (submission.Result == SubmissionResult.Success)
+                        {
+                            user.TotalSolvedProblems++;
+                        }
+                        else
+                        {
+                            user.TotalUnsolvedProblems++;
+                        }
+                    }
+                    else if (this.Status != ProblemStatus.Solved)
+                    {
+                        if (submission.Result == SubmissionResult.Success)
+                        {
+                            user.TotalSolvedProblems++;
+                            user.TotalUnsolvedProblems--;
+                        }
+                    }
+                }
+
+                context.SaveChanges();
+            }
+
             if (submission.Result == SubmissionResult.Success)
                 this.Status = ProblemStatus.Solved;
-            else
+            else if (this.Status != ProblemStatus.Solved)
                 this.Status = ProblemStatus.Unsolved;
 
             this.SaveToDatabase();

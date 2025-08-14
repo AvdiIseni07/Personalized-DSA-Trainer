@@ -9,7 +9,7 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
-        [HttpGet("{Categories}")]
+        [HttpPost("{Categories}")]
         public IActionResult CreateProblemFromCategory(string Categories)
         {
             Problem problem = ProblemGenerator.GenerateFromPrompt(Categories);
