@@ -10,21 +10,19 @@ namespace CustomDSATrainer.Application
     public static class ProblemGenerator
     {   
         public static string difficulty { get; set; } = "Med.";
-        public static string pathToStatement = "AIService/Task/Statement.txt";
-        private static string pathToInput = "AIService/Task/Inputs";
-        private static string pathToOutput = "AIService/Task/Outputs";
-        private static string pathToHint = "AIService/Task/Hint.txt";
         private static Random random = new Random();
 
-        private static Problem InitProblem(string categories)
+        private static Problem InitProblem(List<string> problemData)
         {
-            string statement = File.ReadAllText(Path.GetFullPath(pathToStatement));
-            string title = File.ReadAllLines(Path.GetFullPath(pathToStatement))[0];
-            string hint = File.ReadAllText(Path.GetFullPath(pathToHint));
+            string statement = problemData[0];
+            string title = statement.Split('\n')[0];
+            string inputs = problemData[1];
+            string outputs = problemData[2];
+            string hint = problemData[3];
+            string categories = problemData[4];
 
             title = title.Remove(0, 7);
             statement = statement.Remove(0, 7);
-            
 
             Problem problem = new Problem
             {
@@ -33,23 +31,10 @@ namespace CustomDSATrainer.Application
                 Statement = statement,
                 Difficulty = difficulty,
                 Categories = categories,
-                Hint = hint
+                Hint = hint,
+                Inputs = inputs,
+                Outputs = outputs
             };
-
-            for (int i = 1; i <= 7; i++)
-            {
-                var inputFile = Directory.GetFiles(pathToInput, $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
-                var outputFile = Directory.GetFiles(pathToOutput, $"{i.ToString()}.txt", SearchOption.AllDirectories)[0];
-
-                if (problem.Inputs != string.Empty)
-                    problem.Inputs += "!\n";
-                problem.Inputs += File.ReadAllText(inputFile);
-
-                if (problem.Outputs != string.Empty)
-                    problem.Outputs += "!\n";
-
-                problem.Outputs += File.ReadAllText(outputFile);
-            }
 
             problem.SaveToDatabase();
 
@@ -57,9 +42,9 @@ namespace CustomDSATrainer.Application
         }
         public static Problem GenerateFromPrompt(string categories)
         {
-            PythonAIService.GenerateProblemFromPrompt(categories);
+            List<string> problemData = PythonAIService.GenerateProblemFromPrompt(categories);
 
-            return InitProblem(categories);
+            return InitProblem(problemData);
         }
 
         public static Problem? GenerateProblemFromUnsolved()
@@ -98,8 +83,8 @@ namespace CustomDSATrainer.Application
                             prompt += ", " + category;
                     }
 
-                    PythonAIService.GenerateProblemFromUnsolved(prompt);
-                    generatedProblem = InitProblem(prompt);
+                    List<string> problemData = PythonAIService.GenerateProblemFromUnsolved(prompt);
+                    generatedProblem = InitProblem(problemData);
                 }
             }
 

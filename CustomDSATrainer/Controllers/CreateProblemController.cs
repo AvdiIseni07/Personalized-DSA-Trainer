@@ -1,7 +1,6 @@
 ﻿using CustomDSATrainer.Application;
 using CustomDSATrainer.Domain;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace CustomDSATrainer.Controllers
 {

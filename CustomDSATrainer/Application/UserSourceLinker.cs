@@ -1,19 +1,13 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
+using CustomDSATrainer.Shared;
 using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.Serialization;
 
 namespace CustomDSATrainer.Application
 {
     public class UserSourceLinker
     {
         private TestCase _testCase;
-        private static string pathToOutputFile = "AIService\\UserOutput.txt";
-
         public UserSourceLinker(TestCase testCase)
         {
             _testCase = testCase;
@@ -37,7 +31,7 @@ namespace CustomDSATrainer.Application
                 process.Start();
                 long TimeOfStarting = ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
 
-                List<string> inputList = InputFileParser.ParseInputFile(_testCase.PathToInputFile);
+                List<string> inputList = InputFileParser.ParseInputFile(_testCase.Input);
 
                 foreach (string input in inputList)
                 {
@@ -84,7 +78,7 @@ namespace CustomDSATrainer.Application
 
                 if (!string.IsNullOrEmpty(output))
                 {
-                    File.WriteAllText(Path.GetFullPath(pathToOutputFile), output);
+                    SharedValues.UserOutput = output;
                 }
             }
 

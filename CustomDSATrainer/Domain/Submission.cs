@@ -1,10 +1,7 @@
-﻿using CustomDSATrainer.Application;
-using CustomDSATrainer.Domain.Enums;
+﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Shared;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing.Text;
 
 namespace CustomDSATrainer.Domain
 {
@@ -12,8 +9,6 @@ namespace CustomDSATrainer.Domain
     {
         public int Id { get; set; }
         public required string PathToExecutable { get; set; }
-        private string PathToInput { get; set; } = "AIService/Task/Inputs";
-        private string PathToOutput { get; set; } = "AIService/Task/Outputs";
         public SubmissionResult Result { get; set; }
         public float AverageExecutionTime { get; set; }
         public int ProblemId { get; set; }
@@ -24,7 +19,6 @@ namespace CustomDSATrainer.Domain
         public Submission(string pathToExecutable, string pathToInput)
         {
             PathToExecutable = pathToExecutable;
-            PathToInput = pathToInput;
         }
 
         public void SaveToDatabase()
@@ -48,38 +42,26 @@ namespace CustomDSATrainer.Domain
             }
         }
 
-        public void RunSumbission()
+        public void RunSumbission(string _inputs, string _outputs)
         {
             Result = SubmissionResult.Success;
 
-            for (int i = 1; i <= 7; i ++)
+            List<string> inputs = _inputs.Split('!').ToList();
+            List<string> outputs = _outputs.Split('!').ToList();
+            
+            for (int i = 0; i < 7; i ++)
             {
-                string[] currentInput = Directory.GetFiles(PathToInput, $"{i.ToString()}.txt", SearchOption.AllDirectories);
-                string[] currentOutput = Directory.GetFiles(PathToOutput, $"{i.ToString()}.txt", SearchOption.AllDirectories);
-
-                if (currentInput.Length == 0)
-                {
-                    Result = SubmissionResult.FailedToLocateInput;
-                    return; 
-                }
-
-                if (currentOutput.Length == 0)
-                {
-                    Result = SubmissionResult.FailedToLocateOutput;
-                    return;
-                }
-
                 var testCase = new TestCase
                 {
                     Id = 0,
                     SubmissionId = this.Id,
                     PathToExecutable = PathToExecutable,
-                    PathToInputFile = currentInput[0],
-                    PathToExpectedOutputFile = currentOutput[0]
+                    Input = inputs[i],
+                    ExpectedOutput = outputs[i]
                 };
 
                 TestCaseVerdict verdict = testCase.InitTestCase();
-                testCase.SaveToDatabase();
+                //testCase.SaveToDatabase();
                     
                 if (verdict == TestCaseVerdict.TimeLimitExceeded)
                 {

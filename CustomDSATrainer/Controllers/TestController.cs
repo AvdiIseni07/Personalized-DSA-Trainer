@@ -1,10 +1,6 @@
-﻿using CustomDSATrainer.Application;
-using CustomDSATrainer.Domain;
-using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Persistance;
+﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Shared;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Controllers
 {

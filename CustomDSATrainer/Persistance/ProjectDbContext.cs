@@ -1,6 +1,5 @@
 ﻿using CustomDSATrainer.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace CustomDSATrainer.Persistance
 {
@@ -15,7 +14,6 @@ namespace CustomDSATrainer.Persistance
         public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
         { 
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             /*int indx = 0;

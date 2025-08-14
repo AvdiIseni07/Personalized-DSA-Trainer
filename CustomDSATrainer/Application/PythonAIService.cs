@@ -1,16 +1,15 @@
-﻿using System.Diagnostics;
+﻿using CustomDSATrainer.Domain;
+using System.Diagnostics;
 
 namespace CustomDSATrainer.Application
 {
     public static class PythonAIService
     {
-        public static string pathToPythonProblemGen = "AIService/ProblemGenerator.py";
-        public static string pathToPythonUnsolvedReview = "AIService/UnsolvedCodeReviewer.py";
+        private static string pathToPythonProblemGen = "AIService/ProblemGenerator.py";
+        private static string pathToPythonUnsolvedReview = "AIService/UnsolvedCodeReviewer.py";
         private static string pathToPythonSolvedReview = "AIService/SolvedCodeReviewer.py";
         
-        public static string pathToLLMPrompt = "AIService/ProblemLLMPrompt.txt";
-
-        private static void RunPythonScript(string script)
+        private static ProcessStartInfo GetStartInfo(string script)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -18,46 +17,68 @@ namespace CustomDSATrainer.Application
                 Arguments = $"-u \"{Path.GetFullPath(script)}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                RedirectStandardInput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
-            var process = new Process { StartInfo = startInfo };
-            process.Start();
-            process.WaitForExit();
+            return startInfo;
         }
-        public static void GenerateProblemFromPrompt(string categories)
+        public static List<string> GenerateProblemFromPrompt(string categories)
         {
+            ProcessStartInfo startInfo = GetStartInfo(pathToPythonProblemGen);
+
             string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories;
+            List<string> output = new List<string>();
+            
+            using (var process = new Process { StartInfo = startInfo }) 
+            {
+                process.Start();
 
-            string[] lines = File.ReadAllLines(Path.GetFullPath(pathToLLMPrompt));
-            lines[0] = adaptedLine;
+                process.StandardInput.WriteLine(adaptedLine);
+            
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    string line = process.StandardOutput.ReadLine();
+                    output.Add(line);
+                }
 
-            File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
+                output[0] = output[0].Replace('@', '\n');
+                output.Add(categories);
 
-            RunPythonScript(pathToPythonProblemGen);
+                process.WaitForExit();
+            }
+
+            return output;
         }
-        public static void GenerateProblemFromUnsolved(string categories)
+        public static List<string> GenerateProblemFromUnsolved(string categories)
         {
             string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories
                                 + ". You do not have to use all of them. Use what you think would make the most interesting problem and would help the user the most.";
 
-            string[] lines = File.ReadAllLines(Path.GetFullPath(pathToLLMPrompt));
-            lines[0] = adaptedLine;
-
-            File.WriteAllLines(Path.GetFullPath(pathToLLMPrompt), lines);
-
-            RunPythonScript(pathToPythonProblemGen);
+            return GenerateProblemFromPrompt(categories);
         }
 
-        public static void ReviewUnsolvedPrompt()
+        public static string ReviewProblem(string problemStatement, string userSource, bool solved)
         {
-            RunPythonScript(pathToPythonUnsolvedReview);
-        }
+            ProcessStartInfo startInfo = (solved) ? GetStartInfo(pathToPythonSolvedReview) : GetStartInfo(pathToPythonUnsolvedReview);
 
-        public static void ReviewSolvedPromblem()
-        {
-            RunPythonScript(pathToPythonSolvedReview);
+            string review = string.Empty;
+            using (var process = new Process { StartInfo = startInfo })
+            {
+                process.Start();
+
+                process.StandardInput.Write(problemStatement);
+                process.StandardInput.Write("----------");
+                process.StandardInput.Write(userSource);
+                process.StandardInput.Close();
+
+                review = process.StandardOutput.ReadToEnd();
+
+                process.WaitForExit();
+            }
+
+            return review;
         }
     }
 }

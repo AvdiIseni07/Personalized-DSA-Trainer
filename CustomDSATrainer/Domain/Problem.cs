@@ -1,12 +1,8 @@
-﻿using Azure.Core.Pipeline;
-using CustomDSATrainer.Domain.Enums;
+﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
 using CustomDSATrainer.Shared;
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.AspNetCore.Localization;
 using CustomDSATrainer.Application;
-
 
 namespace CustomDSATrainer.Domain
 {
@@ -61,7 +57,7 @@ namespace CustomDSATrainer.Domain
         {
             Submission submission = new Submission { ProblemId = this.Id, Id = 0, PathToExecutable = pathToExe};
             submission.SaveToDatabase();
-            submission.RunSumbission();
+            submission.RunSumbission(this.Inputs, this.Outputs);
             submission.SaveToDatabase();
 
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
@@ -104,17 +100,12 @@ namespace CustomDSATrainer.Domain
 
             this.SaveToDatabase();
         }
-        private string pathToAIReviewResult = "AIService/CodeReview/Result.txt";
         public string? AiReview(string pathToSource)
         {
             AIReview currentReview = new AIReview {ProblemId = this.Id, PathToCPPFile = pathToSource, ProblemStatus = this.Status };
+            string userSource = File.ReadAllText(Path.GetFullPath(pathToSource));
 
-            if (this.Status != ProblemStatus.Solved)
-                CodeReviewer.ReviewUnsolvedProblem(pathToSource);
-            else
-                CodeReviewer.ReviewSolvedProblem(pathToSource);
-
-            currentReview.Review = File.ReadAllText(Path.GetFullPath(pathToAIReviewResult));
+            currentReview.Review = PythonAIService.ReviewProblem(this.Statement, userSource, this.Status == ProblemStatus.Solved);
 
             currentReview.SaveToDatabase();
 

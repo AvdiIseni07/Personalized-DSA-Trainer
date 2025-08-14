@@ -1,17 +1,16 @@
-﻿using CustomDSATrainer.Domain;
-using CustomDSATrainer.Domain.Enums;
+﻿using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Shared;
 
 namespace CustomDSATrainer.Application
 {
     public class TestCaseRunner
     {
-        private string userOutputFile = "AIService/UserOutput.txt";
-        public TestCaseVerdict RunTest(string expectedOutputFile)
+        public TestCaseVerdict RunTest(string _expectedOutput)
         {
             TestCaseVerdict verdict = TestCaseVerdict.Passed;
 
-            string[] userOutput = File.ReadAllText(userOutputFile).Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] expectedOutput = File.ReadAllText(expectedOutputFile).Split(new[] {' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] userOutput = SharedValues.UserOutput.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] expectedOutput = _expectedOutput.Split(new[] {' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
             if (userOutput.Length < expectedOutput.Length)
             {

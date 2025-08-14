@@ -4,17 +4,9 @@ namespace CustomDSATrainer.Application
 {
     public static class InputFileParser
     {
-        public static List<string> ParseInputFile(string pathToInputFile)
+        public static List<string> ParseInputFile(string text)
         {
-            List<string> result = new List<string>();
-
-            string text = File.ReadAllText(pathToInputFile);
-            string[] inputs = text.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string input in inputs)
-            {
-                result.Add(input);
-            }
+            List<string> result = text.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToList();
            
             return result;
         }

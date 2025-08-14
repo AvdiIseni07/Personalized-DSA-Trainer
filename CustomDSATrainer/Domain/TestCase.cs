@@ -10,8 +10,8 @@ namespace CustomDSATrainer.Domain
     {
         public int Id { get; set; }
         public string PathToExecutable { get; set; }
-        public string PathToInputFile { get; set; }
-        public string PathToExpectedOutputFile { get; set; }  
+        public string Input { get; set; }
+        public string ExpectedOutput { get; set; }  
         public long TimeLimit { get; set; } = 1000; // in milliseconds
         public uint MemoryLimit { get; set; } = 64; // in MB
         public TestCaseVerdict Verdict { get; set; } = TestCaseVerdict.NoVerdict;
@@ -22,9 +22,9 @@ namespace CustomDSATrainer.Domain
         public Submission Submission { get; set; }
 
         public TestCase() { _UserSourceLinker = new UserSourceLinker(this); }
-        public TestCase(string pathToInputFile, uint timeLimit, uint memoryLimit)
+        public TestCase(string input, uint timeLimit, uint memoryLimit)
         {
-            PathToInputFile = pathToInputFile;
+            Input = input;
             TimeLimit = timeLimit;
             MemoryLimit = memoryLimit;
             _UserSourceLinker = new UserSourceLinker(this);
@@ -56,7 +56,7 @@ namespace CustomDSATrainer.Domain
             Verdict = _UserSourceLinker.RunCppExecutable();
 
             if (Verdict == TestCaseVerdict.Passed)
-                Verdict = _TestCaseRunner.RunTest(PathToExpectedOutputFile);
+                Verdict = _TestCaseRunner.RunTest(ExpectedOutput);
 
             return Verdict;
         }

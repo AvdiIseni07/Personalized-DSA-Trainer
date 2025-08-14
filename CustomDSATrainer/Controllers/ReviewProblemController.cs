@@ -1,5 +1,4 @@
-﻿using CustomDSATrainer.Application;
-using CustomDSATrainer.Shared;
+﻿using CustomDSATrainer.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers

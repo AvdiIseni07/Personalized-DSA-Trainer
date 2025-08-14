@@ -2,7 +2,6 @@
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace CustomDSATrainer.Application
 {

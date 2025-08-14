@@ -1,5 +1,4 @@
-﻿using CustomDSATrainer.Domain;
-using CustomDSATrainer.Persistance;
+﻿using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
 

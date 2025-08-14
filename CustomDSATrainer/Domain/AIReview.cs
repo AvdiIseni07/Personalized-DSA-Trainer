@@ -1,9 +1,7 @@
-﻿using CustomDSATrainer.Application;
-using CustomDSATrainer.Domain.Enums;
+﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace CustomDSATrainer.Domain
 {
@@ -21,8 +19,6 @@ namespace CustomDSATrainer.Domain
             PathToCPPFile = pathToCPPFile;
             ProblemStatus = problemStatus;
         }
-       
-
         public void SaveToDatabase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();

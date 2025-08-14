@@ -13,6 +13,12 @@ prompt_path = os.path.join(BASE_DIR, 'ProblemLLMPrompt.txt')
 with open(prompt_path, 'r', encoding='utf-8') as file:
     question = file.read()
 
+firstline = input();
+lines = question.splitlines()
+if lines:
+    lines[0] = firstline
+question = '\n'.join(lines)
+
 response = client.models.generate_content(
     model="gemini-2.0-flash",
     contents=question
@@ -23,66 +29,52 @@ lines = response.text.splitlines()
 inputStarted = False
 outputStarted = False
 hintFound = False
-statement = ""
-input_data = ""
-output_data = ""
-hint = ""
-currentInput = 1
-currentOutput = 1
+statement = ''
+hint = ''
+inputs = []
+outputs = []
+current_data = []
 
 for line in lines:
+    line = line.strip()
     if not hintFound:
         if line == 'HINT':
             hintFound = True
-            continue
         else:
             statement += line + '\n'
     elif not inputStarted:
         if line == 'INPUT':
             inputStarted = True
-            continue
         else:
-            hint += line
+            hint += line + '\n'
     elif not outputStarted:
         if line == 'OUTPUT':
             outputStarted = True
-            input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", f"{currentInput}.txt")
-            os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
-            with open(input_file_path, 'w') as f:
-                f.write(input_data)
-            continue
+            inputs.append(" ".join(current_data).strip())
+            current_data = []
+        elif line == '!':
+            inputs.append(" ".join(current_data).strip())
+            current_data = []
         else:
-            if line == '!':
-                input_file_path = os.path.join(BASE_DIR, "Task", "Inputs", f"{currentInput}.txt")
-                os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
-                with open(input_file_path, 'w') as f:
-                    f.write(input_data)
-                input_data = ""
-                currentInput += 1
-            else:
-                input_data += line + '\n'
+            current_data.append(line)
     else:
         if line == '!':
-            output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", f"{currentOutput}.txt")
-            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-            with open(output_file_path, 'w') as f:
-                f.write(output_data)
-            output_data = ""
-            currentOutput += 1
+            outputs.append(" ".join(current_data).strip())
+            current_data = []
         else:
-            output_data += line + '\n'
+            current_data.append(line)
 
-output_file_path = os.path.join(BASE_DIR, "Task", "Outputs", f"{currentOutput}.txt")
-os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-with open(output_file_path, 'w') as f:
-    f.write(output_data)
+if not outputStarted and current_data:
+    inputs.append(" ".join(current_data).strip())
+elif outputStarted and current_data:
+    outputs.append(" ".join(current_data).strip())
 
-statement_path = os.path.join(BASE_DIR, 'Task', 'Statement.txt')
-os.makedirs(os.path.dirname(statement_path), exist_ok=True)
-with open(statement_path, 'w') as statementFile:
-    statementFile.write(statement)
+problemStatement = statement.strip().replace("\n", "@")
+problemInput = " ! ".join(filter(None, inputs))
+problemOutput = " ! ".join(filter(None, outputs))
+hint = hint.strip()
 
-hint_path = os.path.join(BASE_DIR, 'Task', 'Hint.txt')
-os.makedirs(os.path.dirname(hint_path), exist_ok=True)
-with open(hint_path, 'w') as hintFile:
-    hintFile.write(hint)
+print(problemStatement)
+print(problemInput)
+print(problemOutput)
+print(hint)

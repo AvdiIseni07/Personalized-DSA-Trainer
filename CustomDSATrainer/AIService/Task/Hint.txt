@@ -1,1 +1,0 @@
-Consider performing a Depth-First Search (DFS) and tracking the earliest visited ancestor for each node.  A back edge indicates that the nodes involved in that edge are within a cycle and should not be considered critical.
