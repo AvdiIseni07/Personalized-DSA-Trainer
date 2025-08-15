@@ -24,11 +24,11 @@ namespace CustomDSATrainer.Application
 
             return startInfo;
         }
-        public static List<string> GenerateProblemFromPrompt(string categories)
+        public static List<string> GenerateProblemFromPrompt(string categories, string difficulty)
         {
             ProcessStartInfo startInfo = GetStartInfo(pathToPythonProblemGen);
 
-            string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories;
+            string adaptedLine = $"Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: {categories}. The difficulty should be: {difficulty}";
             List<string> output = new List<string>();
             
             using (var process = new Process { StartInfo = startInfo }) 
@@ -45,18 +45,19 @@ namespace CustomDSATrainer.Application
 
                 output[0] = output[0].Replace('@', '\n');
                 output.Add(categories);
+                output.Add(difficulty);
 
                 process.WaitForExit();
             }
 
             return output;
         }
-        public static List<string> GenerateProblemFromUnsolved(string categories)
+        public static List<string> GenerateProblemFromUnsolved(string categories, string difficulty)
         {
-            string adaptedLine = "Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: " + categories
-                                + ". You do not have to use all of them. Use what you think would make the most interesting problem and would help the user the most.";
+            string adaptedLine = $"Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: {categories}"
+                                + $". You do not have to use all of them. Use what you think would make the most interesting problem and would help the user the most. The difficulty should be {difficulty}";
 
-            return GenerateProblemFromPrompt(categories);
+            return GenerateProblemFromPrompt(categories, difficulty);
         }
 
         public static string ReviewProblem(string problemStatement, string userSource, bool solved)

@@ -9,7 +9,6 @@ namespace CustomDSATrainer.Application
 {
     public static class ProblemGenerator
     {   
-        public static string difficulty { get; set; } = "Med.";
         private static Random random = new Random();
 
         private static Problem InitProblem(List<string> problemData)
@@ -20,6 +19,7 @@ namespace CustomDSATrainer.Application
             string outputs = problemData[2];
             string hint = problemData[3];
             string categories = problemData[4];
+            string difficulty = problemData[5];
 
             title = title.Remove(0, 7);
             statement = statement.Remove(0, 7);
@@ -40,9 +40,9 @@ namespace CustomDSATrainer.Application
 
             return problem;
         }
-        public static Problem GenerateFromPrompt(string categories)
+        public static Problem GenerateFromPrompt(string categories, string difficulty)
         {
-            List<string> problemData = PythonAIService.GenerateProblemFromPrompt(categories);
+            List<string> problemData = PythonAIService.GenerateProblemFromPrompt(categories, difficulty);
 
             return InitProblem(problemData);
         }
@@ -58,10 +58,11 @@ namespace CustomDSATrainer.Application
             {
                 var results = context.Problem.Where(p => p.Status == ProblemStatus.Unsolved).ToList();
                 List<string> categories = new List<string>();
+                List<string> difficulties = new List<string>();
 
                 foreach (var problem in results)
                 {
-                    if (problem.Categories == null)
+                    if (problem.Categories == null || problem.Difficulty == null)
                         continue;
 
                     string[] currentCategories = problem.Categories.Split(',');
@@ -70,6 +71,9 @@ namespace CustomDSATrainer.Application
                         if (!categories.Contains(category))
                             categories.Add(category);
                     }
+
+                    if (!difficulties.Contains(problem.Difficulty))
+                        difficulties.Add(problem.Difficulty);
                 }
 
                 if (categories.Count > 0)
@@ -83,7 +87,9 @@ namespace CustomDSATrainer.Application
                             prompt += ", " + category;
                     }
 
-                    List<string> problemData = PythonAIService.GenerateProblemFromUnsolved(prompt);
+                    int difficultyIndex = random.Next(0, difficulties.Count);
+
+                    List<string> problemData = PythonAIService.GenerateProblemFromUnsolved(prompt, difficulties[difficultyIndex]);
                     generatedProblem = InitProblem(problemData);
                 }
             }

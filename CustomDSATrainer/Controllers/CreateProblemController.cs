@@ -8,10 +8,10 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
-        [HttpPost("{Categories}")]
-        public IActionResult CreateProblemFromCategory(string Categories)
+        [HttpPost("{Categories}/{Difficulty}")]
+        public IActionResult CreateProblemFromCategory(string Categories, string Difficulty)
         {
-            Problem problem = ProblemGenerator.GenerateFromPrompt(Categories);
+            Problem problem = ProblemGenerator.GenerateFromPrompt(Categories, Difficulty);
 
             return Ok($"Generated problem with id {problem.Id}");
         }
