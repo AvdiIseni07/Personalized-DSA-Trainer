@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CustomDSATrainer.Persistance;
 using System.Runtime.CompilerServices;
+using CustomDSATrainer.Application;
 
 var builder = WebApplication.CreateBuilder(args);
     
@@ -28,4 +29,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+UserHandler.InitUser();
+ActivityLogger.LogToday();
+
 app.Run();
+
+
