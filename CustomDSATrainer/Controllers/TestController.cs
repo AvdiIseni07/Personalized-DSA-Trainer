@@ -1,5 +1,5 @@
 ﻿using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Shared;
+using CustomDSATrainer.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers
@@ -9,12 +9,19 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
+        private readonly ProblemService _problemService;
+        public TestController(ProblemService problemService)
+        {
+            _problemService = problemService;
+        }
+
         [HttpGet("{ExePath}")]
         public IActionResult GetExePath(string ExePath)
         {
-            SharedValues.CurrentActiveProblem.Submit(ExePath);
+            var currentProblem = _problemService.CurrentActiveProblem;
+            currentProblem.Submit(ExePath);
 
-            string returnMessage = (SharedValues.CurrentActiveProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
+            string returnMessage = (currentProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
 
             return Ok(returnMessage);
         }

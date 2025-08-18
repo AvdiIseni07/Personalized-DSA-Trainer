@@ -1,5 +1,4 @@
-﻿using CustomDSATrainer.Shared;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace CustomDSATrainer.Persistance
@@ -10,7 +9,14 @@ namespace CustomDSATrainer.Persistance
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
 
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("WebApiDatabase") ?? throw new InvalidOperationException("Connection string not found");
+            optionsBuilder.UseSqlite(connectionString);
 
             return new ProjectDbContext(optionsBuilder.Options);
         }

@@ -1,6 +1,6 @@
 ﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
+using CustomDSATrainer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,17 +11,28 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class LoadProblemController : ControllerBase
     {
+        private readonly ProblemService _problemService;
+        private readonly DatabaseService _databaseService;
+        public LoadProblemController(ProblemService problemService, DatabaseService databaseService)
+        {
+            _problemService = problemService;
+            _databaseService = databaseService;
+        }
+
+        public LoadProblemController() { }
+
         [HttpGet("{ProblemId}")]
         public IActionResult LoadProblem(int ProblemId)
         {
-            if (SharedValues.CurrentActiveProblem != null && SharedValues.CurrentActiveProblem.Status == ProblemStatus.Solving)
+            var currentProblem = _problemService.CurrentActiveProblem;
+            if (currentProblem != null && currentProblem.Status == ProblemStatus.Solving)
             {
-                SharedValues.CurrentActiveProblem.Status = ProblemStatus.WasSolving;
-                SharedValues.CurrentActiveProblem.SaveToDatabase();
+                currentProblem.Status = ProblemStatus.WasSolving;
+                //currentProblem.SaveToDatabase();
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite(_databaseService.GetConnectionString());
             
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {
@@ -29,18 +40,18 @@ namespace CustomDSATrainer.Controllers
 
                 if (problem != null)
                 {
-                    SharedValues.CurrentActiveProblem = problem;
+                    currentProblem = problem;
 
-                    if (SharedValues.CurrentActiveProblem.Status == ProblemStatus.Unsolved)
+                    if (currentProblem.Status == ProblemStatus.Unsolved)
                     {
-                        SharedValues.CurrentActiveProblem.Status = ProblemStatus.Solving;
-                        SharedValues.CurrentActiveProblem.SaveToDatabase();
+                        currentProblem.Status = ProblemStatus.Solving;
+                        //currentProblem.SaveToDatabaes();
                     }
 
                     string[] inputs = problem.Inputs.Split('!');
                     string[] outputs = problem.Outputs.Split('!');
 
-                    return Ok($"The following problem was retrieved succesfully.\n\n{SharedValues.CurrentActiveProblem.Statement}");
+                    return Ok($"The following problem was retrieved succesfully.\n\n{currentProblem.Statement}");
                 }
             }
 

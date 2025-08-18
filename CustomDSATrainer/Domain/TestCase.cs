@@ -1,7 +1,6 @@
 ﻿using CustomDSATrainer.Application;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
@@ -30,7 +29,7 @@ namespace CustomDSATrainer.Domain
             _UserSourceLinker = new UserSourceLinker(this);
         }
         
-        public void SaveToDatabase()
+        /*public void SaveToDatabase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
             optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
@@ -50,7 +49,8 @@ namespace CustomDSATrainer.Domain
 
                 context.SaveChanges();
             }
-        }
+        }*/
+
         public TestCaseVerdict InitTestCase()
         {
             Verdict = _UserSourceLinker.RunCppExecutable();

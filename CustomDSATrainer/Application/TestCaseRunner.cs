@@ -1,15 +1,21 @@
 ﻿using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Shared;
-
+using CustomDSATrainer.Services;
 namespace CustomDSATrainer.Application
 {
     public class TestCaseRunner
     {
+        private UserOutputService _userOutputService;
+
+        public TestCaseRunner(UserOutputService userOutputService)
+        {
+            _userOutputService = userOutputService;
+        }
+        public TestCaseRunner() { }
         public TestCaseVerdict RunTest(string _expectedOutput)
         {
             TestCaseVerdict verdict = TestCaseVerdict.Passed;
 
-            string[] userOutput = SharedValues.UserOutput.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] userOutput = _userOutputService.UserOutput.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             string[] expectedOutput = _expectedOutput.Split(new[] {' ', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
             if (userOutput.Length < expectedOutput.Length)

@@ -1,5 +1,4 @@
 ﻿using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Application
@@ -9,7 +8,7 @@ namespace CustomDSATrainer.Application
         public static void LogToday()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite("DataSource=C:/ProgramData/MainDatabase.db");
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {

@@ -1,6 +1,5 @@
 ﻿using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
@@ -21,7 +20,7 @@ namespace CustomDSATrainer.Domain
             PathToExecutable = pathToExecutable;
         }
 
-        public void SaveToDatabase()
+        /*public void SaveToDatabase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
             optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
@@ -40,7 +39,7 @@ namespace CustomDSATrainer.Domain
 
                 context.SaveChanges();
             }
-        }
+        }*/
 
         public void RunSumbission(string _inputs, string _outputs)
         {

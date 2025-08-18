@@ -1,7 +1,6 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Xml;
 
@@ -36,7 +35,7 @@ namespace CustomDSATrainer.Application
                 Outputs = outputs
             };
 
-            problem.SaveToDatabase();
+           // problem.SaveToDatabase();
 
             return problem;
         }
@@ -52,7 +51,7 @@ namespace CustomDSATrainer.Application
             Problem? generatedProblem = null;
 
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite("DataSource = C:/ProgramData/MainDatabase.db");
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {
@@ -102,7 +101,7 @@ namespace CustomDSATrainer.Application
             Problem? generatedProblem = null;
 
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite("DataSource=C:/ProgramData/MainDatabase.db");
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {
@@ -123,7 +122,7 @@ namespace CustomDSATrainer.Application
             Problem? generatedProblem = null;
 
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite("DataSource=C:/ProgramData/MainDatabase.db");
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {

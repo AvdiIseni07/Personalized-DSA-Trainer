@@ -1,17 +1,23 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Shared;
+using CustomDSATrainer.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Entity;
 
 namespace CustomDSATrainer.Application
 {
-    public static class UserHandler
+   /* public static class UserHandler
     {
+        private static DatabaseService _databaseService;
+        public UserHandler(DatabaseService databaseService)
+        {
+            _databaseService = databaseService;
+        }
         public static void InitUser()
         {
             // Later to be changed for multiple users
             var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+            optionsBuilder.UseSqlite();
 
             using (var context = new ProjectDbContext(optionsBuilder.Options))
             {
@@ -25,5 +31,5 @@ namespace CustomDSATrainer.Application
                 }
             }
         }
-    }
+    }*/
 }

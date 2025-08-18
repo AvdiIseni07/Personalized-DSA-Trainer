@@ -1,13 +1,19 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Shared;
+using CustomDSATrainer.Services;
 using System.Diagnostics;
 
 namespace CustomDSATrainer.Application
 {
     public class UserSourceLinker
     {
+        private UserOutputService _userOutputService;
         private TestCase _testCase;
+
+        public UserSourceLinker(UserOutputService userOutputService)
+        {
+            _userOutputService = userOutputService;
+        }
         public UserSourceLinker(TestCase testCase)
         {
             _testCase = testCase;
@@ -78,7 +84,7 @@ namespace CustomDSATrainer.Application
 
                 if (!string.IsNullOrEmpty(output))
                 {
-                    SharedValues.UserOutput = output;
+                    _userOutputService.UserOutput = output;
                 }
             }
 
