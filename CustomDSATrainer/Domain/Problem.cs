@@ -1,20 +1,22 @@
 ﻿using CustomDSATrainer.Domain.Enums;
-using System.Collections;
-using System.Numerics;
-
+using CustomDSATrainer.Persistance;
+using Microsoft.EntityFrameworkCore;
+using CustomDSATrainer.Application;
 
 namespace CustomDSATrainer.Domain
 {
     public class Problem
     {
         public required int Id { get; set; }
-        public required string Title { get; set; }
-        public required string Statement { get; set; }
-        public required string Difficulty { get; set; }
-        public required string Categories { get; set; } // "category1,category2"
-        public ProblemStatus Status { get; set; } = ProblemStatus.Unsolved;
-        
-        public ICollection<TestCase> TestCases { get; set; } = new List<TestCase>();
+        public string? Title { get; set; } = string.Empty;
+        public string? Statement { get; set; } = string.Empty;
+        public string? Difficulty { get; set; } = string.Empty;
+        public string? Categories { get; set; } = string.Empty; // "category1,category2"
+        public string? Hint { get; set; } = string.Empty;
+        public ProblemStatus Status { get; set; } = ProblemStatus.NotTried;
+        public string Inputs { get; set; } = string.Empty;
+        public string Outputs { get; set; } = string.Empty;
+      
         public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
         public ICollection<AIReview> AIReviews { get; set; } = new List<AIReview>();
         public Problem()
@@ -27,5 +29,29 @@ namespace CustomDSATrainer.Domain
             Difficulty = difficulty;
             Categories = categories;
         }
+
+        /*public void SaveToDatabase()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
+            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
+
+            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            {
+                var existingProblem = context.Problem.Find(Id);
+
+                if (existingProblem == null)
+                {
+                    context.Problem.Add(this);
+                }
+                else
+                {
+                    context.Entry(existingProblem).CurrentValues.SetValues(this);
+                }
+
+                context.SaveChanges();
+            }
+        }*/
+
+        
     }
 }
