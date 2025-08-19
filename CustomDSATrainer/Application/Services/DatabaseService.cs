@@ -1,6 +1,8 @@
-﻿namespace CustomDSATrainer.Services
+﻿using CustomDSATrainer.Domain.Interfaces.Services;
+
+namespace CustomDSATrainer.Application.Services
 {
-    public class DatabaseService
+    public class DatabaseService : IDatabaseService
     {
         private string _connectionString;
 

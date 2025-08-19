@@ -1,5 +1,6 @@
-﻿using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Services;
+﻿using CustomDSATrainer.Application.Services;
+using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers
@@ -9,17 +10,20 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
-        private readonly ProblemService _problemService;
-        public TestController(ProblemService problemService)
+        private readonly IProblemService _problemService;
+        private CurrentActiveProblemService _currentActiveProblemService;
+        public TestController(IProblemService problemService, CurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
+            _currentActiveProblemService = currentActiveProblemService;
         }
 
         [HttpGet("{ExePath}")]
         public IActionResult GetExePath(string ExePath)
         {
-            var currentProblem = _problemService.CurrentActiveProblem;
-            currentProblem.Submit(ExePath);
+            var currentProblem = _currentActiveProblemService.CurrentProblem;
+            if (currentProblem == null) {return BadRequest("There is no problem loaded.");}
+            _problemService.SubmitProblem(currentProblem, ExePath);
 
             string returnMessage = (currentProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
 

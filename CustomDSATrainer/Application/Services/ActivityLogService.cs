@@ -1,16 +1,20 @@
-﻿using CustomDSATrainer.Persistance;
+﻿using CustomDSATrainer.Domain.Interfaces;
+using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
 
-namespace CustomDSATrainer.Application
+namespace CustomDSATrainer.Application.Services
 {
-    public static class ActivityLogger
+    public class ActivityLogService : IActivityLogService
     {
-        public static void LogToday()
+        private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
+        public ActivityLogService(IDbContextFactory<ProjectDbContext> dbContextFactory)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite("DataSource=C:/ProgramData/MainDatabase.db");
-
-            using (var context = new ProjectDbContext(optionsBuilder.Options))
+            _dbContextFactory = dbContextFactory;
+        }
+        public void LogToday()
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
             {
                 string date = DateTime.Now.ToString();
                 date = date.Substring(0, 10);
@@ -31,7 +35,7 @@ namespace CustomDSATrainer.Application
                         string yesterday = DateTime.Now.AddDays(-1).ToString();
                         yesterday = yesterday.Substring(0, 10);
 
-                        if (daysLogged.Contains(yesterday)) 
+                        if (daysLogged.Contains(yesterday))
                         {
                             userFound.LoggingStreak++;
                         }

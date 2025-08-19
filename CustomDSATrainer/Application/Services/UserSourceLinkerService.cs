@@ -1,29 +1,25 @@
-﻿using CustomDSATrainer.Domain;
+﻿using CustomDSATrainer.Application;
+using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Services;
+using CustomDSATrainer.Domain.Interfaces.Services;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace CustomDSATrainer.Application
+namespace CustomDSATrainer.Application.Services
 {
-    public class UserSourceLinker
+    public class UserSourceLinkerService : IUserSourceLinkerService
     {
         private UserOutputService _userOutputService;
-        private TestCase _testCase;
-
-        public UserSourceLinker(UserOutputService userOutputService)
+        public UserSourceLinkerService(UserOutputService userOutputService)
         {
             _userOutputService = userOutputService;
         }
-        public UserSourceLinker(TestCase testCase)
-        {
-            _testCase = testCase;
-        }
-        public TestCaseVerdict RunCppExecutable()
+        public TestCaseVerdict RunCppExecutable(TestCase testCase)
         {
             TestCaseVerdict currentVerdict = TestCaseVerdict.Passed;
             var startInfo = new ProcessStartInfo
             {
-                FileName = _testCase.PathToExecutable,
+                FileName = testCase.PathToExecutable,
                 Arguments = $"",
                 UseShellExecute = false,
                 RedirectStandardInput = true,
@@ -37,7 +33,7 @@ namespace CustomDSATrainer.Application
                 process.Start();
                 long TimeOfStarting = ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
 
-                List<string> inputList = InputFileParser.ParseInputFile(_testCase.Input);
+                List<string> inputList = testCase.Input.Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 foreach (string input in inputList)
                 {
@@ -55,7 +51,7 @@ namespace CustomDSATrainer.Application
                             long currentTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
                             long currentMemoryUsage = process.WorkingSet64 / (1024 * 1024);
 
-                            if (currentTime - TimeOfStarting >= _testCase.TimeLimit)
+                            if (currentTime - TimeOfStarting >= testCase.TimeLimit)
                             {
                                 currentVerdict = TestCaseVerdict.TimeLimitExceeded;
 
@@ -63,7 +59,7 @@ namespace CustomDSATrainer.Application
                                 break;
                             }
 
-                            if (currentMemoryUsage > _testCase.MemoryLimit)
+                            if (currentMemoryUsage > testCase.MemoryLimit)
                             {
                                 currentVerdict = TestCaseVerdict.MemoryLimitExceeded;
 

@@ -1,6 +1,8 @@
-﻿using CustomDSATrainer.Domain.Enums;
+﻿using CustomDSATrainer.Application.Services;
+using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,49 +13,30 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class LoadProblemController : ControllerBase
     {
-        private readonly ProblemService _problemService;
-        private readonly DatabaseService _databaseService;
-        public LoadProblemController(ProblemService problemService, DatabaseService databaseService)
+        private readonly IProblemService _problemService;
+        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
+        private readonly CurrentActiveProblemService _currentActiveProblemService;
+        public LoadProblemController(IProblemService problemService, IDbContextFactory<ProjectDbContext> contextFactory, CurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
-            _databaseService = databaseService;
+            _contextFactory = contextFactory;
+            _currentActiveProblemService = currentActiveProblemService;
         }
-
-        public LoadProblemController() { }
 
         [HttpGet("{ProblemId}")]
         public IActionResult LoadProblem(int ProblemId)
         {
-            var currentProblem = _problemService.CurrentActiveProblem;
+            var currentProblem = _currentActiveProblemService.CurrentProblem;
             if (currentProblem != null && currentProblem.Status == ProblemStatus.Solving)
             {
                 currentProblem.Status = ProblemStatus.WasSolving;
-                //currentProblem.SaveToDatabase();
+                _problemService.SaveToDatabase(currentProblem);
             }
 
-            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(_databaseService.GetConnectionString());
-            
-            using (var context = new ProjectDbContext(optionsBuilder.Options))
-            {
-                var problem = context.Problem.FirstOrDefault(p => p.Id == ProblemId);
+            _problemService.LoadProblem(ProblemId);
 
-                if (problem != null)
-                {
-                    currentProblem = problem;
-
-                    if (currentProblem.Status == ProblemStatus.Unsolved)
-                    {
-                        currentProblem.Status = ProblemStatus.Solving;
-                        //currentProblem.SaveToDatabaes();
-                    }
-
-                    string[] inputs = problem.Inputs.Split('!');
-                    string[] outputs = problem.Outputs.Split('!');
-
-                    return Ok($"The following problem was retrieved succesfully.\n\n{currentProblem.Statement}");
-                }
-            }
+            if (_currentActiveProblemService.CurrentProblem != null)
+                return Ok($"The following problem was retrieved succesfully.\n\n{_currentActiveProblemService.CurrentProblem.Statement}");
 
             return NotFound($"Problem with id: {ProblemId} was not found");
         }

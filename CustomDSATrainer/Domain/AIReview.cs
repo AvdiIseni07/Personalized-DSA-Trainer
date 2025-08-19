@@ -18,27 +18,5 @@ namespace CustomDSATrainer.Domain
             PathToCPPFile = pathToCPPFile;
             ProblemStatus = problemStatus;
         }
-        
-        /*public void SaveToDatabase()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
-
-            using (var context = new ProjectDbContext(optionsBuilder.Options))
-            {
-                var existingReview = context.AIReview.Find(Id);
-
-                if (existingReview == null)
-                {
-                    context.AIReview.Add(this);
-                }
-                else
-                {
-                    context.Entry(existingReview).CurrentValues.SetValues(this);
-                }
-
-                context.SaveChanges();
-            }
-        }*/
     }
 }

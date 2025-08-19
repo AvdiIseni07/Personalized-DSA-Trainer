@@ -1,6 +1,6 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Services;
+using CustomDSATrainer.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Entity;
 

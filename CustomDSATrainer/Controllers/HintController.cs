@@ -1,4 +1,5 @@
-﻿using CustomDSATrainer.Services;
+﻿using CustomDSATrainer.Application.Services;
+using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers
@@ -7,17 +8,19 @@ namespace CustomDSATrainer.Controllers
     [Route("api/[controller]")]
     public class HintController : ControllerBase
     {
-        private readonly ProblemService _problemService;
+        private readonly IProblemService _problemService;
+        private CurrentActiveProblemService _currentActiveProblemService;
 
-        public HintController(ProblemService problemService)
+        public HintController(IProblemService problemService, CurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
+            _currentActiveProblemService = currentActiveProblemService;
         }
-        
+
         [HttpGet]
         public IActionResult LoadHint()
         {
-            var currentProblem = _problemService.CurrentActiveProblem;
+            var currentProblem = _currentActiveProblemService.CurrentProblem;
             if (currentProblem == null) { return BadRequest("No problem is currently loaded."); }
             if (currentProblem.Hint == null) { return BadRequest("This specific problem does not have a hint."); }
 

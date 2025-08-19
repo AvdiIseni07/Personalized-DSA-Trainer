@@ -28,30 +28,6 @@ namespace CustomDSATrainer.Domain
             Statement = statement;
             Difficulty = difficulty;
             Categories = categories;
-        }
-
-        /*public void SaveToDatabase()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ProjectDbContext>();
-            optionsBuilder.UseSqlite(SharedValues.SqliteDatasource);
-
-            using (var context = new ProjectDbContext(optionsBuilder.Options))
-            {
-                var existingProblem = context.Problem.Find(Id);
-
-                if (existingProblem == null)
-                {
-                    context.Problem.Add(this);
-                }
-                else
-                {
-                    context.Entry(existingProblem).CurrentValues.SetValues(this);
-                }
-
-                context.SaveChanges();
-            }
-        }*/
-
-        
+        }        
     }
 }

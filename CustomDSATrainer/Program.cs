@@ -1,17 +1,34 @@
-using Microsoft.EntityFrameworkCore;
-using CustomDSATrainer.Persistance;
-using System.Runtime.CompilerServices;
 using CustomDSATrainer.Application;
-using CustomDSATrainer.Services;
+using CustomDSATrainer.Application.Services;
+using CustomDSATrainer.Domain.Interfaces.Repositories;
+using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Persistance;
+using CustomDSATrainer.Persistance.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
-    
-builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
-builder.Services.AddScoped<ProjectDbContext>();
+builder.Services.AddDbContextFactory<ProjectDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("WebApiDatabase")));
+
 builder.Services.AddSingleton<DatabaseService>();
-builder.Services.AddSingleton<ProblemService>();
-builder.Services.AddSingleton<UserOutputService>();
+builder.Services.AddScoped<IProblemService, ProblemService>();
+builder.Services.AddTransient<ISubmissionService, SubmissionService>();
+builder.Services.AddTransient<IAIReviewService, AIReviewService>();
+builder.Services.AddTransient<ITestCaseService, TestCaseService>();
+builder.Services.AddTransient<IUserSourceLinkerService, UserSourceLinkerService>();
+builder.Services.AddTransient<UserOutputService>();
+builder.Services.AddSingleton<CurrentActiveProblemService>();
+builder.Services.AddTransient<IPythonAIService, PythonAIService>();
+builder.Services.AddTransient<IActivityLogService, ActivityLogService>();
+builder.Services.AddTransient<IProblemGeneratorService, ProblemGeneratorService>();
+
+builder.Services.AddScoped<IProblemRepository, ProblemRespository>();
+builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
+builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
+builder.Services.AddScoped<IUserProgressRepository, UserProgressRepository>();
 
 // Add services to the container.
 
@@ -39,7 +56,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 //UserHandler.InitUser();
-ActivityLogger.LogToday();
+//var activityLogger = app.Services.GetRequiredService<ActivityLogService>();
+//activityLogger.LogToday();
 
 app.Run();
 

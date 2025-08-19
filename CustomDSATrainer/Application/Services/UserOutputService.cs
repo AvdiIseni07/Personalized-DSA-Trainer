@@ -1,4 +1,4 @@
-﻿namespace CustomDSATrainer.Services
+﻿namespace CustomDSATrainer.Application.Services
 {
     public class UserOutputService
     {
@@ -10,6 +10,5 @@
             set => _userOutput = value;
         }
 
-      
     }
 }
