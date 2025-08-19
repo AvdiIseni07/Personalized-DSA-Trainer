@@ -1,5 +1,6 @@
 ﻿using CustomDSATrainer.Domain.Enums;
-using System.Runtime.CompilerServices;
+using CustomDSATrainer.Persistance;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
 {
@@ -17,6 +18,5 @@ namespace CustomDSATrainer.Domain
             PathToCPPFile = pathToCPPFile;
             ProblemStatus = problemStatus;
         }
-
     }
 }

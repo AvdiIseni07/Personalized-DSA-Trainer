@@ -1,33 +1,29 @@
 ﻿using CustomDSATrainer.Domain.Enums;
+using CustomDSATrainer.Persistance;
+using CustomDSATrainer.Application.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
 {
     public class TestCase
     {
         public int Id { get; set; }
-        public required string PathToInputFile { get; set; }
-        public required string PathToOutputFile {  get; set; }
-        public required string PathToExpectedOutputFile { get; set; }
-
-        public required decimal TimeLimit { get; set; } = 1.0M; // in seconds
-        public required uint MemoryLimit { get; set; } = 64; // in MB
+        public string PathToExecutable { get; set; }
+        public string Input { get; set; }
+        public string ExpectedOutput { get; set; }  
+        public long TimeLimit { get; set; } = 1000; // in milliseconds
+        public uint MemoryLimit { get; set; } = 64; // in MB
         public TestCaseVerdict Verdict { get; set; } = TestCaseVerdict.NoVerdict;
-
-        public long TimeOfStarting { get; set; } // Unix timestamp
         public decimal ExecutionTime { get; set; }
-
-        public int ProblemId { get; set; }
-        public Problem Problem { get; set; }
+        public int SubmissionId { get; set; }
+        public Submission Submission { get; set; }
 
         public TestCase() { }
-        public TestCase(string pathToInputFile, string pathToOutputFile, string pathToExpectedOutputFile, decimal timeLimit, uint memoryLimit)
+        public TestCase(string input, uint timeLimit, uint memoryLimit)
         {
-            PathToInputFile = pathToInputFile;
-            PathToOutputFile = pathToOutputFile;
-            PathToExpectedOutputFile = pathToExpectedOutputFile;
+            Input = input;
             TimeLimit = timeLimit;
             MemoryLimit = memoryLimit;
-        }
-
+        }        
     }
 }

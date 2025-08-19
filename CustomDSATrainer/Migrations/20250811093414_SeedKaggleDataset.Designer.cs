@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CustomDSATrainer.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20250807122853_SeedKaggleDataset")]
+    [Migration("20250811093414_SeedKaggleDataset")]
     partial class SeedKaggleDataset
     {
         /// <inheritdoc />
@@ -154,7 +154,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 9,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -253,7 +253,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 20,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -424,7 +424,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 39,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -1774,7 +1774,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 189,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -10315,7 +10315,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 1138,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -16462,7 +16462,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 1821,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -17254,7 +17254,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 1909,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -17425,7 +17425,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 1928,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -22069,7 +22069,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 2444,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Med.",
                             Statement = "",
                             Status = 1,
@@ -25534,7 +25534,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 2829,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Hard",
                             Statement = "",
                             Status = 1,
@@ -30304,7 +30304,7 @@ namespace CustomDSATrainer.Migrations
                         new
                         {
                             Id = 3359,
-                            Categories = "/",
+                            Categories = "Combinatorics",
                             Difficulty = "Hard",
                             Statement = "",
                             Status = 1,
@@ -32528,6 +32528,10 @@ namespace CustomDSATrainer.Migrations
                     b.Property<uint>("MemoryLimit")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("PathToExecutable")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PathToExpectedOutputFile")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -32536,17 +32540,10 @@ namespace CustomDSATrainer.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PathToOutputFile")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ProblemId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("TimeLimit")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("TimeOfStarting")
+                    b.Property<long>("TimeLimit")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Verdict")

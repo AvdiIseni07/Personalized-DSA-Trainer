@@ -1,6 +1,5 @@
 ﻿using CustomDSATrainer.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace CustomDSATrainer.Persistance
 {
@@ -15,10 +14,9 @@ namespace CustomDSATrainer.Persistance
         public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
         { 
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            int indx = 0;
+            /*int indx = 0;
             List<Problem> LeetcodeKaggleDataset = new List<Problem>();
 
             foreach (string line in File.ReadLines("C:/ProgramData/csv_parser/csvtotext.txt"))
@@ -58,12 +56,12 @@ namespace CustomDSATrainer.Persistance
                 indx++;
             }
 
-            modelBuilder.Entity<Problem>().HasData(LeetcodeKaggleDataset.ToArray());
+            modelBuilder.Entity<Problem>().HasData(LeetcodeKaggleDataset.ToArray());*/
 
             modelBuilder.Entity<TestCase>()
-                .HasOne(tc => tc.Problem)
-                .WithMany(p => p.TestCases)
-                .HasForeignKey(tc => tc.ProblemId)
+                .HasOne(tc => tc.Submission)
+                .WithMany(s => s.TestCases)
+                .HasForeignKey(tc => tc.SubmissionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Submission>()
