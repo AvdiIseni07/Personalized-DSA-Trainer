@@ -5,29 +5,30 @@ using Microsoft.AspNetCore.Mvc;
 namespace CustomDSATrainer.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/revision-with-categories")]
     public class RevisionWithCategoriesController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
-        public RevisionWithCategoriesController(IProblemGeneratorService problemGeneratorService)
+        private readonly IProblemService _problemService;
+        public RevisionWithCategoriesController(IProblemGeneratorService problemGeneratorService, IProblemService problemService)
         {
             _problemGeneratorService = problemGeneratorService ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
+            _problemService = problemService;
         }
 
-        [HttpGet("{Categories}")]
-        public IActionResult RevisionWithCategories(string Categories)
+        [HttpPost("{Categories}")]
+        public async Task<IActionResult> RevisionWithCategories(string Categories)
         {
-            Problem? problem = _problemGeneratorService.RevisionWithCategories(Categories);
+            Problem? problem = await _problemGeneratorService.RevisionWithCategories(Categories);
 
             if (problem != null)
             {
-                // LoadProblemController loadProblemController = new LoadProblemController();
-                // loadProblemController.LoadProblem(problem.Id);
+                await _problemService.LoadProblem(problem.Id);
 
                 return Ok($"Selected problem with id: {problem.Id} for revision");
             }
             else
-                return BadRequest();
+                return NotFound("Error finding a problem");
         }
     }
 }

@@ -12,11 +12,11 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null");
         }
-        public void UpdateProblemData(Problem problem, Submission submission)
+        public async void UpdateProblemData(Problem problem, Submission submission)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var user = context.UserProgress.FirstOrDefault(u => u.Id == 1);
+                var user = await context.UserProgress.FirstOrDefaultAsync(u => u.Id == 1);
 
                 if (user != null)
                 {
@@ -46,7 +46,7 @@ namespace CustomDSATrainer.Persistance.Repositories
                 else if (problem.Status != ProblemStatus.Solved)
                     problem.Status = ProblemStatus.Unsolved;
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

@@ -20,23 +20,23 @@ namespace CustomDSATrainer.Persistance.Repositories
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
         }
 
-        public Problem? GetFromId(int id)
+        public async Task<Problem?> GetFromId(int id)
         {
             Problem? problem = null;
 
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                problem = context.Problem.FirstOrDefault(p => p.Id == id);
+                problem = await context.Problem.FirstOrDefaultAsync(p => p.Id == id);
             }
 
             return problem;
         }
 
-        public void SaveToDatabase(Problem problem)
+        public async void SaveToDatabase(Problem problem)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var existingProblem = context.Problem.Find(problem.Id);
+                var existingProblem = await context.Problem.FindAsync(problem.Id);
 
                 if (existingProblem == null)
                 {
@@ -47,16 +47,16 @@ namespace CustomDSATrainer.Persistance.Repositories
                     context.Entry(existingProblem).CurrentValues.SetValues(problem);
                 }
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
-        public Tuple<string, string> GetUnsolvedData()
+        public async Task<Tuple<string, string>> GetUnsolvedData()
         {
             string prompt = string.Empty, difficulty = string.Empty;
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var results = context.Problem.Where(p => p.Status == ProblemStatus.Unsolved).ToList();
+                var results = await context.Problem.Where(p => p.Status == ProblemStatus.Unsolved).ToListAsync();
                 List<string> categories = new List<string>();
                 List<string> difficulties = new List<string>();
 
@@ -93,13 +93,13 @@ namespace CustomDSATrainer.Persistance.Repositories
 
             return new Tuple<string, string>(prompt, difficulty);
         }
-        public Problem? GetRevision()
+        public async Task<Problem?> GetRevision()
         {
             Problem? problem = null;
 
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var results = context.Problem.Where(p => p.Status == ProblemStatus.Solved).ToList();
+                var results = await context.Problem.Where(p => p.Status == ProblemStatus.Solved).ToListAsync();
 
                 if (results.Count > 0)
                 {
@@ -110,13 +110,13 @@ namespace CustomDSATrainer.Persistance.Repositories
 
             return problem;
         }
-        public Problem? GetRevisionWithCategories(string categories)
+        public async Task<Problem?> GetRevisionWithCategories(string categories)
         {
             Problem? problem = null;
 
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var results = context.Problem.Where(p => p.Categories.Contains(categories)).ToList();
+                var results = await context.Problem.Where(p => p.Categories.Contains(categories)).ToListAsync();
 
                 if (results.Count > 0)
                 {

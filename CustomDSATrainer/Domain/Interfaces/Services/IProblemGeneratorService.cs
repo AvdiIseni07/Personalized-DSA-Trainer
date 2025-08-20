@@ -3,8 +3,8 @@
     public interface IProblemGeneratorService
     {
         Problem GenerateFromPrompt(string categories, string difficulty);
-        Problem? GenerateProblemFromUnsolved();
-        Problem? Revision();
-        Problem? RevisionWithCategories(string categories);
+        Task<Problem?> GenerateProblemFromUnsolved();
+        Task<Problem?> Revision();
+        Task<Problem?> RevisionWithCategories(string categories);
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CustomDSATrainer.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/revision")]
     public class RevisionController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
@@ -16,18 +16,18 @@ namespace CustomDSATrainer.Controllers
             _problemService = problemService;
         }
 
-        [HttpGet]
-        public IActionResult Revision()
+        [HttpPost]
+        public async Task<IActionResult> Revision()
         {
-            Problem? problem = _problemGeneratorService.Revision();
+            Problem? problem = await _problemGeneratorService.Revision();
 
             if (problem != null)
             {
-                _problemService.LoadProblem(problem.Id);
+                await _problemService.LoadProblem(problem.Id);
 
                 return Ok($"Selected problem with id: {problem.Id} for revision");
             }
-            return BadRequest();
+            return NotFound("Error finding a problem");
         }
     }
 }

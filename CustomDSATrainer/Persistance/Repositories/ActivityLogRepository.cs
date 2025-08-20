@@ -11,14 +11,14 @@ namespace CustomDSATrainer.Persistance.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
-        public void LogToday()
+        public async void LogToday()
         {
-            using (var context = _dbContextFactory.CreateDbContext())
+            using (var context = await _dbContextFactory.CreateDbContextAsync())
             {
                 string date = DateTime.Now.ToString();
                 date = date.Substring(0, 10);
 
-                var userFound = context.UserProgress.FirstOrDefault(u => u.Id == 1); // Later to be changed for more users
+                var userFound = await context.UserProgress.FirstOrDefaultAsync(u => u.Id == 1); // Later to be changed for more users
                 if (userFound != null)
                 {
                     List<string> daysLogged = userFound.DaysLogged.Split(',').ToList();
@@ -43,7 +43,7 @@ namespace CustomDSATrainer.Persistance.Repositories
                             userFound.LoggingStreak = 1;
                         }
 
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                 }
             }

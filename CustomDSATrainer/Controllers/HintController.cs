@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace CustomDSATrainer.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/hint")]
     public class HintController : ControllerBase
     {
         private readonly IProblemService _problemService;
-        private CurrentActiveProblemService _currentActiveProblemService;
+        private ICurrentActiveProblemService _currentActiveProblemService;
 
-        public HintController(IProblemService problemService, CurrentActiveProblemService currentActiveProblemService)
+        public HintController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
             _currentActiveProblemService = currentActiveProblemService;

@@ -12,22 +12,22 @@ namespace CustomDSATrainer.Persistance.Repositories
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
         }
 
-        public void SaveToDatabase(AIReview aiReview)
+        public async void SaveToDatabase(AIReview aiReview)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var existingReview = context.AIReview.Find(aiReview.Id);
+                var existingReview = await context.AIReview.FindAsync(aiReview.Id);
 
                 if (existingReview == null)
                 {
-                    context.AIReview.Add(aiReview);
+                    await context.AIReview.AddAsync(aiReview);
                 }
                 else
                 {
                     context.Entry(existingReview).CurrentValues.SetValues(aiReview);
                 }
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

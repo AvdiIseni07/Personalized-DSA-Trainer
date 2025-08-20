@@ -10,20 +10,20 @@ namespace CustomDSATrainer.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/load-problem")]
     public class LoadProblemController : ControllerBase
     {
         private readonly IProblemService _problemService;
         private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
-        private readonly CurrentActiveProblemService _currentActiveProblemService;
-        public LoadProblemController(IProblemService problemService, IDbContextFactory<ProjectDbContext> contextFactory, CurrentActiveProblemService currentActiveProblemService)
+        private readonly ICurrentActiveProblemService _currentActiveProblemService;
+        public LoadProblemController(IProblemService problemService, IDbContextFactory<ProjectDbContext> contextFactory, ICurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
             _contextFactory = contextFactory;
             _currentActiveProblemService = currentActiveProblemService;
         }
 
-        [HttpGet("{ProblemId}")]
+        [HttpPost("{ProblemId}")]
         public IActionResult LoadProblem(int ProblemId)
         {
             var currentProblem = _currentActiveProblemService.CurrentProblem;

@@ -11,11 +11,11 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
         }
-        public void SaveToDatabase(TestCase testCase)
+        public async void SaveToDatabase(TestCase testCase)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var existingTestCase = context.TestCase.Find(testCase.Id);
+                var existingTestCase = await context.TestCase.FindAsync(testCase.Id);
 
                 if (existingTestCase == null)
                 {
@@ -26,7 +26,7 @@ namespace CustomDSATrainer.Persistance.Repositories
                     context.Entry(existingTestCase).CurrentValues.SetValues(testCase);
                 }
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

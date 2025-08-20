@@ -1,8 +1,9 @@
 ﻿using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.Interfaces.Services;
 
 namespace CustomDSATrainer.Application.Services
 {
-    public class CurrentActiveProblemService
+    public class CurrentActiveProblemService : ICurrentActiveProblemService
     {
         private Problem? problem;
 

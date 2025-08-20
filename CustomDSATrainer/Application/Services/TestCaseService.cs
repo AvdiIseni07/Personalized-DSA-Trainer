@@ -11,10 +11,10 @@ namespace CustomDSATrainer.Application.Services
 {
     public class TestCaseService : ITestCaseService
     {
-        private UserOutputService _userOutputService;
+        private IUserOutputService _userOutputService;
         private readonly IUserSourceLinkerService _userSourceLinkerService;
         private readonly ITestCaseRepository _testCaseRepository;
-        public TestCaseService(UserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, ITestCaseRepository testCaseRepository)
+        public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, ITestCaseRepository testCaseRepository)
         {
             _userOutputService = userOutputService ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
             _userSourceLinkerService = userSourceLinkerService ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");

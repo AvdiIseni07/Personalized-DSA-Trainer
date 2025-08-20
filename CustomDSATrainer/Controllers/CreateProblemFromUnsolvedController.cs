@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CustomDSATrainer.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/problem-from-unsolved")]
     public class CreateProblemFromUnsolvedController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
@@ -14,15 +14,15 @@ namespace CustomDSATrainer.Controllers
             _problemGeneratorService = problemGeneratorService ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
         }
 
-        [HttpGet]
-        public IActionResult CreateProblemFromUnsolved()
+        [HttpPost]
+        public async Task<IActionResult> CreateProblemFromUnsolved()
         {
-            Problem? problem = _problemGeneratorService.GenerateProblemFromUnsolved();
+            Problem? problem = await _problemGeneratorService.GenerateProblemFromUnsolved();
 
             if (problem != null)
                 return Ok($"Generated problem with id {problem.Id}");
             else
-                return BadRequest();
+                return BadRequest("Could not generate a problem");
         }
     }
 }

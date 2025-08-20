@@ -11,11 +11,11 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             _contextFactory = contextFactory;
         }
-        public void SaveToDatabase(Submission submission)
+        public async void SaveToDatabase(Submission submission)
         {
-            using (var context = _contextFactory.CreateDbContext())
+            using (var context = await _contextFactory.CreateDbContextAsync())
             {
-                var existingSubmission = context.Submissions.Find(submission.Id);
+                var existingSubmission = await context.Submissions.FindAsync(submission.Id);
                 if (existingSubmission == null)
                 {
                     context.Submissions.Add(submission);
@@ -25,7 +25,7 @@ namespace CustomDSATrainer.Persistance.Repositories
                     context.Entry(existingSubmission).CurrentValues.SetValues(submission);
                 }
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
     }

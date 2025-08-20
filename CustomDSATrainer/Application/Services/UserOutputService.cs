@@ -1,6 +1,8 @@
-﻿namespace CustomDSATrainer.Application.Services
+﻿using CustomDSATrainer.Domain.Interfaces.Services;
+
+namespace CustomDSATrainer.Application.Services
 {
-    public class UserOutputService
+    public class UserOutputService : IUserOutputService
     {
         private string _userOutput = string.Empty;
 

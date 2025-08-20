@@ -9,8 +9,8 @@ namespace CustomDSATrainer.Application.Services
 {
     public class UserSourceLinkerService : IUserSourceLinkerService
     {
-        private UserOutputService _userOutputService;
-        public UserSourceLinkerService(UserOutputService userOutputService)
+        private IUserOutputService _userOutputService;
+        public UserSourceLinkerService(IUserOutputService userOutputService)
         {
             _userOutputService = userOutputService;
         }

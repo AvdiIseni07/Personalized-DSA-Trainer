@@ -7,25 +7,24 @@ namespace CustomDSATrainer.Controllers
 {
     
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/submit")]
     public class TestController : ControllerBase
     {
         private readonly IProblemService _problemService;
-        private CurrentActiveProblemService _currentActiveProblemService;
-        public TestController(IProblemService problemService, CurrentActiveProblemService currentActiveProblemService)
+        private ICurrentActiveProblemService _currentActiveProblemService;
+        public TestController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService;
             _currentActiveProblemService = currentActiveProblemService;
         }
 
-        [HttpGet("{ExePath}")]
+        [HttpPost("{ExePath}")]
         public IActionResult GetExePath(string ExePath)
         {
-            var currentProblem = _currentActiveProblemService.CurrentProblem;
-            if (currentProblem == null) {return BadRequest("There is no problem loaded.");}
-            _problemService.SubmitProblem(currentProblem, ExePath);
+            if (_currentActiveProblemService.CurrentProblem == null) {return BadRequest("There is no problem loaded.");}
+            _problemService.SubmitProblem(_currentActiveProblemService.CurrentProblem, ExePath);
 
-            string returnMessage = (currentProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
+            string returnMessage = (_currentActiveProblemService.CurrentProblem.Status == ProblemStatus.Solved) ? "Problem solved succesfully." : "Problem was not solved.";
 
             return Ok(returnMessage);
         }

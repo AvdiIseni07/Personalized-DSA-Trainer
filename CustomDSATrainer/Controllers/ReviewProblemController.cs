@@ -5,19 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace CustomDSATrainer.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/review")]
     public class ReviewProblemController : ControllerBase
     {
         private readonly IProblemService _problemService;
-        private CurrentActiveProblemService _currentActiveProblemService;
-        public ReviewProblemController(IProblemService problemService, CurrentActiveProblemService currentActiveProblemService)
+        private ICurrentActiveProblemService _currentActiveProblemService;
+        public ReviewProblemController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
         {
             _problemService = problemService ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
             _currentActiveProblemService = currentActiveProblemService;
         }
 
-
-        [HttpGet("{SourceCodePath}")]
+        [HttpPost("{SourceCodePath}")]
         public IActionResult ReviewUnsolvedProblem(string SourceCodePath)
         {
             var currentProblem = _currentActiveProblemService.CurrentProblem;
@@ -29,7 +28,7 @@ namespace CustomDSATrainer.Controllers
             {
                 return Ok(review);
             }
-            return BadRequest();
+            return BadRequest("Error generating review");
         }
     }
 }

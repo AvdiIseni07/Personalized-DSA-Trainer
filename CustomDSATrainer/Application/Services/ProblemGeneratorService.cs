@@ -61,10 +61,10 @@ namespace CustomDSATrainer.Application.Services
             return InitProblem(problemData);
         }
 
-        public Problem? GenerateProblemFromUnsolved()
+        public async Task<Problem?> GenerateProblemFromUnsolved()
         {
             Problem? generatedProblem = null;
-            Tuple<string, string> data = _problemRepository.GetUnsolvedData();
+            Tuple<string, string> data = await _problemRepository.GetUnsolvedData();
 
             List<string> problemData = _pythonAIService.GenerateProblemFromUnsolved(data.Item1, data.Item2);
             generatedProblem = InitProblem(problemData);
@@ -72,16 +72,16 @@ namespace CustomDSATrainer.Application.Services
             return generatedProblem;
         }
 
-        public Problem? Revision()
+        public async Task<Problem?> Revision()
         {
-            Problem? generatedProblem = _problemRepository.GetRevision();
+            Problem? generatedProblem = await _problemRepository.GetRevision();
 
             return generatedProblem;
         }
 
-        public Problem? RevisionWithCategories(string categories)
+        public async Task<Problem?> RevisionWithCategories(string categories)
         {
-            Problem? generatedProblem = _problemRepository.GetRevisionWithCategories(categories);
+            Problem? generatedProblem = await _problemRepository.GetRevisionWithCategories(categories);
 
             return generatedProblem;
         }

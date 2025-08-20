@@ -2,10 +2,10 @@
 {
     public interface IProblemRepository
     {
-        Problem? GetFromId(int id);
+        Task<Problem?> GetFromId(int id);
         void SaveToDatabase(Problem problem);
-        Tuple<string, string> GetUnsolvedData();
-        Problem? GetRevision();
-        Problem? GetRevisionWithCategories(string categories);
+        Task<Tuple<string, string>> GetUnsolvedData();
+        Task<Problem?> GetRevision();
+        Task<Problem?> GetRevisionWithCategories(string categories);
     }
 }

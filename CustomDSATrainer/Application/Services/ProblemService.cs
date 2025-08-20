@@ -8,7 +8,7 @@ namespace CustomDSATrainer.Application.Services
 {
     public class ProblemService : IProblemService
     {
-        private CurrentActiveProblemService _currentActiveProblem;
+        private ICurrentActiveProblemService _currentActiveProblem;
 
         private readonly ISubmissionService _submissionService;
         private readonly IPythonAIService _pythonAIService;
@@ -17,7 +17,7 @@ namespace CustomDSATrainer.Application.Services
         private readonly IUserProgressRepository _userProgressRepository;
         private readonly IAIReviewRepository _aiReviewRepository;
         public ProblemService(
-            ISubmissionService submissionService, CurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
+            ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
             IProblemRepository problemRepository, IUserProgressRepository userProgressRepository, IAIReviewRepository aIReviewRepository)
         {
             _submissionService = submissionService ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
@@ -40,9 +40,9 @@ namespace CustomDSATrainer.Application.Services
             _userProgressRepository.UpdateProblemData(problem, submission);
         }
 
-        public bool LoadProblem(int id)
+        public async Task<bool> LoadProblem(int id)
         {
-            Problem? problem = _problemRepository.GetFromId(id);
+            Problem? problem = await _problemRepository.GetFromId(id);
             _currentActiveProblem.CurrentProblem = problem;
 
             if (problem != null)
