@@ -12,8 +12,8 @@ namespace CustomDSATrainer.Controllers
         private readonly IProblemService _problemService;
         public RevisionWithCategoriesController(IProblemGeneratorService problemGeneratorService, IProblemService problemService)
         {
-            _problemGeneratorService = problemGeneratorService ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
-            _problemService = problemService;
+            _problemGeneratorService = problemGeneratorService  ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
+            _problemService = problemService                    ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
         }
 
         [HttpPost("{Categories}")]

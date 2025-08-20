@@ -3,6 +3,7 @@ using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CustomDSATrainer.Controllers
 {

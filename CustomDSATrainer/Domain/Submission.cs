@@ -7,7 +7,7 @@ namespace CustomDSATrainer.Domain
     public class Submission
     {
         public int Id { get; set; }
-        public required string PathToExecutable { get; set; }
+        public required string PathToExecutable { get; set; } = string.Empty;
         public SubmissionResult Result { get; set; }
         public float AverageExecutionTime { get; set; }
         public int ProblemId { get; set; }

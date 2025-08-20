@@ -12,7 +12,7 @@ namespace CustomDSATrainer.Application.Services
         private IUserOutputService _userOutputService;
         public UserSourceLinkerService(IUserOutputService userOutputService)
         {
-            _userOutputService = userOutputService;
+            _userOutputService = userOutputService ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null");
         }
         public TestCaseVerdict RunCppExecutable(TestCase testCase)
         {

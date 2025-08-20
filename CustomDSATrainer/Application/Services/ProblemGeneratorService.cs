@@ -1,11 +1,9 @@
 ﻿using CustomDSATrainer.Domain;
-using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
-using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Persistance.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
+using CustomDSATrainer.Domain.Validators;
+using FluentValidation.Results;
+using System.CodeDom;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -17,9 +15,9 @@ namespace CustomDSATrainer.Application.Services
 
         public ProblemGeneratorService(IPythonAIService pythonAIService, IProblemService problemService, IProblemRepository problemRepository)
         {
-            _pythonAIService = pythonAIService ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
-            _problemService = problemService ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
-            _problemRepository = problemRepository;
+            _pythonAIService = pythonAIService      ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
+            _problemService = problemService        ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
+            _problemRepository = problemRepository  ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null");
         }
 
         private Problem InitProblem(List<string> problemData)
@@ -47,8 +45,13 @@ namespace CustomDSATrainer.Application.Services
                 Outputs = outputs
             };
 
-            //var problemRepository = _repositoryFactory.CreateProblemRepository();
-            //problemRepository.SaveToDatabase(problem);
+            ProblemValidator validator = new ProblemValidator();
+            ValidationResult result = validator.Validate(problem);
+
+            if (!result.IsValid)
+            {
+                throw new Exception(result.Errors.ToArray().ToString());
+            }
 
             _problemService.SaveToDatabase(problem);
 

@@ -1,6 +1,7 @@
 ﻿using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CustomDSATrainer.Controllers
 {
@@ -13,8 +14,8 @@ namespace CustomDSATrainer.Controllers
 
         public HintController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
         {
-            _problemService = problemService;
-            _currentActiveProblemService = currentActiveProblemService;
+            _problemService = problemService                           ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
+            _currentActiveProblemService = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
         }
 
         [HttpGet]
@@ -22,9 +23,9 @@ namespace CustomDSATrainer.Controllers
         {
             var currentProblem = _currentActiveProblemService.CurrentProblem;
             if (currentProblem == null) { return BadRequest("No problem is currently loaded."); }
-            if (currentProblem.Hint == null) { return BadRequest("This specific problem does not have a hint."); }
+            if (currentProblem.Hint.IsNullOrEmpty()) { return BadRequest("This specific problem does not have a hint."); }
 
-            return Ok(currentProblem.Hint);
+            return Ok($"Hint for selected problem: {currentProblem.Hint}");
         }
     }
 }

@@ -12,8 +12,8 @@ namespace CustomDSATrainer.Controllers
         private ICurrentActiveProblemService _currentActiveProblemService;
         public ReviewProblemController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
         {
-            _problemService = problemService ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
-            _currentActiveProblemService = currentActiveProblemService;
+            _problemService = problemService                            ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
+            _currentActiveProblemService = currentActiveProblemService  ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService");
         }
 
         [HttpPost("{SourceCodePath}")]

@@ -12,7 +12,7 @@ namespace CustomDSATrainer.Application.Services
         private readonly string _kaggleCSVPath;
         public SeedingService(IDbContextFactory<ProjectDbContext> dbContextFactory, IConfiguration configuration)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactory cannot be null");
             _kaggleCSVPath = configuration["SeedData:KaggleCSVPath"] ?? throw new ArgumentNullException(nameof(configuration), "No kaggle CSV path is found.");
         }
         private string GetCategories(string categoryColumn)

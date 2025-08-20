@@ -2,8 +2,10 @@ using CustomDSATrainer.Application;
 using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Middleware;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Persistance.Repositories;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -40,6 +42,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 var dbService = app.Services.GetRequiredService<DatabaseService>();
 dbService.init(app.Configuration);
 
@@ -49,12 +53,12 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedKaggleDataset();
 }
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 

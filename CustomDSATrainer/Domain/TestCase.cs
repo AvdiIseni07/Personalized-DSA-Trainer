@@ -9,8 +9,8 @@ namespace CustomDSATrainer.Domain
     {
         public int Id { get; set; }
         public string PathToExecutable { get; set; }
-        public string Input { get; set; }
-        public string ExpectedOutput { get; set; }  
+        public string Input { get; set; } = string.Empty;
+        public string ExpectedOutput { get; set; } = string.Empty;
         public long TimeLimit { get; set; } = 1000; // in milliseconds
         public uint MemoryLimit { get; set; } = 64; // in MB
         public TestCaseVerdict Verdict { get; set; } = TestCaseVerdict.NoVerdict;

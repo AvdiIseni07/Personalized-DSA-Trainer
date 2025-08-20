@@ -2,7 +2,9 @@
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.Validators;
 using CustomDSATrainer.Persistance;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Entity;
 
@@ -14,8 +16,8 @@ namespace CustomDSATrainer.Application.Services
         private readonly ISubmissionRepository _submissionRepository;
         public SubmissionService(ITestCaseService testCaseService, ISubmissionRepository submissionRepository)
         {
-            _testCaseService = testCaseService ?? throw new ArgumentNullException(nameof(testCaseService), "TestCaseService cannot be null.");
-            _submissionRepository = submissionRepository;
+            _testCaseService = testCaseService              ?? throw new ArgumentNullException(nameof(testCaseService), "TestCaseService cannot be null.");
+            _submissionRepository = submissionRepository    ?? throw new ArgumentNullException(nameof(submissionRepository), "SubmissionRepository cannot be null");
         }
 
         public void RunSumbission(Submission submission, string _inputs, string _outputs)
@@ -36,8 +38,16 @@ namespace CustomDSATrainer.Application.Services
                     ExpectedOutput = outputs[i]
                 };
 
+                TestCaseValidator validator = new TestCaseValidator();
+                ValidationResult result = validator.Validate(testCase);
+
+                if (!result.IsValid)
+                {
+                    throw new Exception(result.Errors.ToArray().ToString());
+                }
+
                 TestCaseVerdict verdict = _testCaseService.InitTestCase(testCase);
-                //testCase.SaveToDatabase();
+                _testCaseService.SaveToDatabase(testCase);
 
                 if (verdict == TestCaseVerdict.TimeLimitExceeded)
                 {

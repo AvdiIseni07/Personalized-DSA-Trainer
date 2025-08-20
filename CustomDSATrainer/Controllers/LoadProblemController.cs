@@ -18,9 +18,9 @@ namespace CustomDSATrainer.Controllers
         private readonly ICurrentActiveProblemService _currentActiveProblemService;
         public LoadProblemController(IProblemService problemService, IDbContextFactory<ProjectDbContext> contextFactory, ICurrentActiveProblemService currentActiveProblemService)
         {
-            _problemService = problemService;
-            _contextFactory = contextFactory;
-            _currentActiveProblemService = currentActiveProblemService;
+            _problemService = problemService                           ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
+            _contextFactory = contextFactory                           ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
+            _currentActiveProblemService = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null");
         }
 
         [HttpPost("{ProblemId}")]

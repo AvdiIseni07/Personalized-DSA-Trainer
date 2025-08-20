@@ -2,6 +2,7 @@
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -10,7 +11,7 @@ namespace CustomDSATrainer.Application.Services
         private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
         public ActivityLogService(IDbContextFactory<ProjectDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactoryc cannot be null");
         }
         public void LogToday()
         {

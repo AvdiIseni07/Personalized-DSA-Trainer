@@ -16,9 +16,9 @@ namespace CustomDSATrainer.Application.Services
         private readonly ITestCaseRepository _testCaseRepository;
         public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, ITestCaseRepository testCaseRepository)
         {
-            _userOutputService = userOutputService ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
-            _userSourceLinkerService = userSourceLinkerService ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");
-            _testCaseRepository = testCaseRepository;
+            _userOutputService = userOutputService              ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
+            _userSourceLinkerService = userSourceLinkerService  ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");
+            _testCaseRepository = testCaseRepository            ?? throw new ArgumentNullException(nameof(testCaseRepository), "TestCaseRepository cannot be null.");
         }
 
         public TestCaseVerdict InitTestCase(TestCase testCase)
