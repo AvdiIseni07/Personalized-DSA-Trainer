@@ -17,10 +17,10 @@ namespace CustomDSATrainer.Application.Services
     /// </summary>
     public class ProblemService : IProblemService
     {
-        private ICurrentActiveProblemService _currentActiveProblem;
-
         private readonly ISubmissionService _submissionService;
+        private readonly IProblemService _problemService;
         private readonly IPythonAIService _pythonAIService;
+        private ICurrentActiveProblemService _currentActiveProblemService;
 
         private readonly IProblemRepository _problemRepository;
         private readonly IUserProgressRepository _userProgressRepository;
@@ -29,16 +29,17 @@ namespace CustomDSATrainer.Application.Services
         private readonly ILogger<ProblemService> _logger;
 
         public ProblemService(
-            ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
+            ISubmissionService submissionService, IProblemService problemService,ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
             IProblemRepository problemRepository, IUserProgressRepository userProgressRepository, IAIReviewRepository aIReviewRepository, ILogger<ProblemService> logger)
         {
-            _submissionService = submissionService              ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
-            _currentActiveProblem = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
-            _pythonAIService = pythonAIService                  ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
-            _problemRepository = problemRepository              ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null.");
-            _userProgressRepository = userProgressRepository    ?? throw new ArgumentNullException(nameof(userProgressRepository), "UserProgressRepository cannot be null");
-            _aiReviewRepository = aIReviewRepository            ?? throw new ArgumentNullException(nameof(aIReviewRepository), "AIReviewRepository cannot be null"); 
-            _logger = logger                                    ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+            _submissionService = submissionService                      ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
+            _problemService = problemService                            ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
+            _currentActiveProblemService = currentActiveProblemService  ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
+            _pythonAIService = pythonAIService                          ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
+            _problemRepository = problemRepository                      ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null.");
+            _userProgressRepository = userProgressRepository            ?? throw new ArgumentNullException(nameof(userProgressRepository), "UserProgressRepository cannot be null");
+            _aiReviewRepository = aIReviewRepository                    ?? throw new ArgumentNullException(nameof(aIReviewRepository), "AIReviewRepository cannot be null"); 
+            _logger = logger                                            ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
         }
         
         /// <summary>
@@ -80,19 +81,26 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>Whether the <see cref="Problem"/> has been loaded successfully.</returns>
         public async Task<bool> LoadProblem(int id)
         {
-            Problem? problem = await _problemRepository.GetFromId(id);
-            _currentActiveProblem.CurrentProblem = problem;
-
-            if (problem != null)
+            Problem? currentProblem = _currentActiveProblemService.CurrentProblem;
+            if (currentProblem != null && currentProblem.Status == ProblemStatus.Solving)
             {
-                if (problem.Status == ProblemStatus.Unsolved)
+                currentProblem.Status = ProblemStatus.WasSolving;
+                _problemService.SaveToDatabase(currentProblem);
+            }
+
+            currentProblem = await _problemRepository.GetFromId(id);
+            _currentActiveProblemService.CurrentProblem = currentProblem;
+
+            if (currentProblem != null)
+            {
+                if (currentProblem.Status == ProblemStatus.Unsolved)
                 {
-                    problem.Status = ProblemStatus.Solving;
-                    SaveToDatabase(problem);
+                    currentProblem.Status = ProblemStatus.Solving;
+                    SaveToDatabase(currentProblem);
                 }
 
-                string[] inputs = problem.Inputs.Split('!');
-                string[] outputs = problem.Outputs.Split('!');
+                string[] inputs = currentProblem.Inputs.Split('!');
+                string[] outputs = currentProblem.Outputs.Split('!');
 
                 return true;
             }

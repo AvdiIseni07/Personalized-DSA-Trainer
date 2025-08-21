@@ -27,13 +27,6 @@ namespace CustomDSATrainer.Controllers
         [HttpPost("{ProblemId}")]
         public IActionResult LoadProblem(int ProblemId)
         {
-            var currentProblem = _currentActiveProblemService.CurrentProblem;
-            if (currentProblem != null && currentProblem.Status == ProblemStatus.Solving)
-            {
-                currentProblem.Status = ProblemStatus.WasSolving;
-                _problemService.SaveToDatabase(currentProblem);
-            }
-
             _problemService.LoadProblem(ProblemId);
 
             if (_currentActiveProblemService.CurrentProblem != null)

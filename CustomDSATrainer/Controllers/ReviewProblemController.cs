@@ -27,10 +27,7 @@ namespace CustomDSATrainer.Controllers
 
             string? review = _problemService.AiReview(currentProblem, SourceCodePath);
 
-            if (review != null)
-            {
-                return Ok(review);
-            }
+            if (review != null) return Ok(review);
             return BadRequest("Error generating review");
         }
     }
