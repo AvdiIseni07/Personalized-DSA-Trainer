@@ -2,10 +2,13 @@
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace CustomDSATrainer.Application.Services
 {
+    /// <summary>
+    /// Provides functionality to seed the kaggle dataset.
+    /// It gets the CSV file based on the configuration and parses it.
+    /// </summary>
     public class SeedingService : ISeedingService
     {
         private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
@@ -15,26 +18,32 @@ namespace CustomDSATrainer.Application.Services
             _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactory cannot be null");
             _kaggleCSVPath = configuration["SeedData:KaggleCSVPath"] ?? throw new ArgumentNullException(nameof(configuration), "No kaggle CSV path is found.");
         }
+        /// <summary>
+        /// Returns the categories it is able to identify from the title.
+        /// </summary>
+        /// <param name="categoryColumn">The title of the problem.</param>
+        /// <returns>A List of the categories it was able to identify.</returns>
         private string GetCategories(string categoryColumn)
         {
-            string categories = "";
+            List<string> categories = new List<string>();
 
             if (categoryColumn.Contains("Tree"))
-                categories += "Trees ,";
+                categories.Add("Trees");
             if (categoryColumn.Contains("Graph"))
-                categories += "Graphs ,";
+                categories.Add("Graphs");
             if (categoryColumn.Contains("Path"))
-                categories += "Graphs/Trees ,";
+                categories.Add("Graphs/Trees");
             if (categoryColumn.Contains("String"))
-                categories += "String ,";
+                categories.Add("String");
             if (categoryColumn.Contains("Combination"))
-                categories += "Combinatorics ,";
+                categories.Add("Combinatorics");
 
-            if (categories.EndsWith(','))
-                categories = categories.Remove(categories.Length - 2, 2);
-
-            return categories;
+            return string.Join(',', categories);
         }
+        /// <summary>
+        /// Seeds the kaggle dataset into the database.
+        /// </summary>
+        /// <exception cref="Exception">The CSV file hasn't been found in the specified path.</exception>
         public async Task SeedKaggleDataset()
         {
             if (!File.Exists(_kaggleCSVPath))

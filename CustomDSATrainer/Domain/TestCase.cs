@@ -1,7 +1,4 @@
 ﻿using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Application.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Domain
 {

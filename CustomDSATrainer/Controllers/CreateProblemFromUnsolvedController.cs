@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers
 {
+    /// <summary>
+    /// A controller to generate a <see cref="Problem"/> from the unsolved ones.
+    /// </summary>
     [ApiController]
     [Route("api/problem-from-unsolved")]
     public class CreateProblemFromUnsolvedController : ControllerBase
@@ -20,9 +23,9 @@ namespace CustomDSATrainer.Controllers
             Problem? problem = await _problemGeneratorService.GenerateProblemFromUnsolved();
 
             if (problem != null)
-                return Ok($"Generated problem with id {problem.Id}");
+                return Ok($"Generated problem with id {problem.Id}.");
             else
-                return BadRequest("Could not generate a problem");
+                return BadRequest("Could not generate a problem.");
         }
     }
 }

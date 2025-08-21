@@ -1,11 +1,14 @@
-﻿using CustomDSATrainer.Application.Services;
+﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Permissions;
 
 namespace CustomDSATrainer.Controllers
 {
-    
+    /// <summary>
+    /// A controller that makes a <see cref="Submission"/> for the loaded <see cref="Problem"/>.
+    /// </summary>
     [ApiController]
     [Route("api/submit")]
     public class TestController : ControllerBase

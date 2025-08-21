@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Persistance.Repositories
 {
+    /// <summary>
+    /// The repository for logging the daily activity of the user.
+    /// </summary>
     public class ActivityLogRepository : IActivityLogRepository 
     {
         private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
@@ -11,6 +14,12 @@ namespace CustomDSATrainer.Persistance.Repositories
             _dbContextFactory = dbContextFactory;
         }
 
+        /// <summary>
+        /// Adds the current day to the database.
+        /// It also checks whether the day before is also in the database.
+        /// If it is it increases the daily streak +1.
+        /// Otherwise it resets it to 1.
+        /// </summary>
         public async void LogToday()
         {
             using (var context = await _dbContextFactory.CreateDbContextAsync())

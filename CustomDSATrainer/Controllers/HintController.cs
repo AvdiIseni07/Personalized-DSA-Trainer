@@ -1,20 +1,21 @@
-﻿using CustomDSATrainer.Application.Services;
+﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CustomDSATrainer.Controllers
 {
+    /// <summary>
+    /// A controller that shows the hint (<see cref="Problem.Hint"/>) for the selected <see cref="Problem"/>.
+    /// </summary>
     [ApiController]
     [Route("api/hint")]
     public class HintController : ControllerBase
     {
-        private readonly IProblemService _problemService;
         private ICurrentActiveProblemService _currentActiveProblemService;
 
-        public HintController(IProblemService problemService, ICurrentActiveProblemService currentActiveProblemService)
+        public HintController(ICurrentActiveProblemService currentActiveProblemService)
         {
-            _problemService = problemService                           ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
             _currentActiveProblemService = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
         }
 

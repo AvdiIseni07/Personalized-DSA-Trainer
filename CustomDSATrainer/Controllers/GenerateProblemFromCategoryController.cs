@@ -1,12 +1,12 @@
-﻿using CustomDSATrainer.Application;
-using CustomDSATrainer.Application.Services;
-using CustomDSATrainer.Domain;
+﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CustomDSATrainer.Controllers
 {
+    /// <summary>
+    /// A controller that generates a <see cref="Problem"/> based on the given categories and difficulty.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class GenerateProblemFromCategoryController : ControllerBase

@@ -3,16 +3,19 @@ using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Domain.Validators;
 using FluentValidation.Results;
-using System.CodeDom;
 
 namespace CustomDSATrainer.Application.Services
 {
+    /// <summary>
+    /// Provides functionality for generating problems from prompt, from unsolved and for revision with or without categories.
+    /// </summary>
     public class ProblemGeneratorService : IProblemGeneratorService
     {
         private readonly IPythonAIService _pythonAIService;
         private readonly IProblemService _problemService;
         private readonly IProblemRepository _problemRepository;
 
+        private const int TITLE_PREFIX_LENGTH = 7;
         public ProblemGeneratorService(IPythonAIService pythonAIService, IProblemService problemService, IProblemRepository problemRepository)
         {
             _pythonAIService = pythonAIService      ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
@@ -20,6 +23,21 @@ namespace CustomDSATrainer.Application.Services
             _problemRepository = problemRepository  ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null");
         }
 
+        /// <summary>
+        /// Initialises a new <see cref="Problem"/> based on the gived problem data.
+        /// </summary>
+        /// <param name="problemData">Cointains all the data needed for the problem:
+        /// <list type="bullet">
+        /// <item>[0] = Title and statement.</item>
+        /// <item>[1] = Problem inputs</item>
+        /// <item>[2] = Expected outputs</item>
+        /// <item>[3] = Hint</item>
+        /// <item>[4] = Categories</item>
+        /// <item>[5] = Difficulty</item>
+        /// </list>                                              
+        /// </param>
+        /// <returns>Returns the generated <see cref="Problem"/> if generation is succesful.</returns>
+        /// <exception cref="Exception">The validator has deemed that it has not been initialized correctly</exception>
         private Problem InitProblem(List<string> problemData)
         {
             string statement = problemData[0];
@@ -30,8 +48,8 @@ namespace CustomDSATrainer.Application.Services
             string categories = problemData[4];
             string difficulty = problemData[5];
 
-            title = title.Remove(0, 7);
-            statement = statement.Remove(0, 7);
+            title = title.Remove(0, TITLE_PREFIX_LENGTH);
+            statement = statement.Remove(0, TITLE_PREFIX_LENGTH);
 
             Problem problem = new Problem
             {
@@ -57,6 +75,13 @@ namespace CustomDSATrainer.Application.Services
 
             return problem;
         }
+
+        /// <summary>
+        /// Generates a <see cref="Problem"/> based on the given prompts from the user.
+        /// </summary>
+        /// <param name="categories">The categories that the problem shuld have.</param>
+        /// <param name="difficulty">The difficilty of the problem.</param>
+        /// <returns>The generated <see cref="Problem"/>, if generated successfully.</returns>
         public Problem GenerateFromPrompt(string categories, string difficulty)
         {
             List<string> problemData = _pythonAIService.GenerateProblemFromPrompt(categories, difficulty);
@@ -64,6 +89,12 @@ namespace CustomDSATrainer.Application.Services
             return InitProblem(problemData);
         }
 
+        /// <summary>
+        /// Goes through all the unsolved problems of the user and gathers the categories and difficulties.
+        /// It then picks at random what three categories to use and what difficulty should the problem be.
+        /// It then generates a problem based on these picks.
+        /// </summary>
+        /// <returns>The generated <see cref="Problem"/>, if generated successfully</returns>
         public async Task<Problem?> GenerateProblemFromUnsolved()
         {
             Problem? generatedProblem = null;
@@ -75,6 +106,11 @@ namespace CustomDSATrainer.Application.Services
             return generatedProblem;
         }
 
+        /// <summary>
+        /// It picks a random <see cref="Problem"/> that the user has already solved.
+        /// It then sends it back to the user to be solved again.
+        /// </summary>
+        /// <returns>The selected <see cref="Problem"/>, if the selection process is successful</returns>
         public async Task<Problem?> Revision()
         {
             Problem? generatedProblem = await _problemRepository.GetRevision();
@@ -82,6 +118,11 @@ namespace CustomDSATrainer.Application.Services
             return generatedProblem;
         }
 
+        /// <summary>
+        /// It does the same as <see cref="Revision">, except that it picks at random from only those solved problems that have the specified categories.
+        /// </summary>
+        /// <param name="categories">The categories that the already solved problems should contain</param>
+        /// <returns>The selected <see cref="Problem"/>, if the selection process is successful</returns>
         public async Task<Problem?> RevisionWithCategories(string categories)
         {
             Problem? generatedProblem = await _problemRepository.GetRevisionWithCategories(categories);

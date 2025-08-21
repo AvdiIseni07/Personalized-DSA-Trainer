@@ -9,16 +9,22 @@ namespace CustomDSATrainer.Application.Services
     public class ActivityLogService : IActivityLogService
     {
         private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
+        private const int DATE_PREFIX = 10;
         public ActivityLogService(IDbContextFactory<ProjectDbContext> dbContextFactory)
         {
-            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactoryc cannot be null");
+            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactory cannot be null");
         }
+        /// <summary>
+        /// First checks if the current day is already saved into the user's database. If it isn't it then adds it.
+        /// Additionally it also checks if the DB contains yesterday's day.
+        /// If it does it adds +1 to the logging streak. Otherwise it resets it to 1.
+        /// </summary>
         public void LogToday()
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
                 string date = DateTime.Now.ToString();
-                date = date.Substring(0, 10);
+                date = date.Substring(0, DATE_PREFIX);
 
                 var userFound = context.UserProgress.FirstOrDefault(u => u.Id == 1); // Later to be changed for more users
                 if (userFound != null)

@@ -1,15 +1,15 @@
-﻿using Azure.Core.Pipeline;
-using CustomDSATrainer.Application.Services;
+﻿using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
-using System;
+
 
 namespace CustomDSATrainer.Persistance.Repositories
 {
+    /// <summary>
+    /// Repository for <see cref="Problem"/>
+    /// </summary>
     public class ProblemRespository : IProblemRepository
     {
         private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
@@ -19,7 +19,12 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
         }
-
+        
+        /// <summary>
+        /// Tries to get a problem from the database from the given ID.
+        /// </summary>
+        /// <param name="id">The ID of the required problem.</param>
+        /// <returns>Returns the required <see cref="Problem"/>, if found in the database.</returns>
         public async Task<Problem?> GetFromId(int id)
         {
             Problem? problem = null;
@@ -32,6 +37,11 @@ namespace CustomDSATrainer.Persistance.Repositories
             return problem;
         }
 
+        /// <summary>
+        /// Saves a <see cref="Problem"/> to the database.
+        /// If it already exists, it only updates the values.
+        /// </summary>
+        /// <param name="problem">The problem that needs to be saved.</param>
         public async void SaveToDatabase(Problem problem)
         {
             using (var context = await _contextFactory.CreateDbContextAsync())
@@ -51,6 +61,12 @@ namespace CustomDSATrainer.Persistance.Repositories
             }
         }
 
+        /// <summary>
+        /// Gets all the categories of the unsolved problems.
+        /// Also gets a random difficulty from the unsolved problems.
+        /// It is used for <see cref="ProblemGeneratorService.GenerateProblemFromUnsolved"/>.
+        /// </summary>
+        /// <returns></returns>
         public async Task<Tuple<string, string>> GetUnsolvedData()
         {
             string prompt = string.Empty, difficulty = string.Empty;
@@ -93,6 +109,12 @@ namespace CustomDSATrainer.Persistance.Repositories
 
             return new Tuple<string, string>(prompt, difficulty);
         }
+
+        /// <summary>
+        /// Selects a random <see cref="Problem"/> that has been solved so the user can try to solve it again.
+        /// It is used by <see cref="ProblemGeneratorService.Revision"/>.
+        /// </summary>
+        /// <returns>The selected <see cref="Problem"/>, if the process was successful.</returns>
         public async Task<Problem?> GetRevision()
         {
             Problem? problem = null;
@@ -110,6 +132,13 @@ namespace CustomDSATrainer.Persistance.Repositories
 
             return problem;
         }
+
+        /// <summary>
+        /// Selects a random <see cref="Problem"/> that has the specified categories and has been solved so that the user can try to solve it again.
+        /// It is used by <see cref="ProblemGeneratorService.RevisionWithCategories(string)"/>.
+        /// </summary>
+        /// <param name="categories">The categories that the problem must have.</param>
+        /// <returns>Returns the selected <see cref="Problem"/>, if the process was successful.</returns>
         public async Task<Problem?> GetRevisionWithCategories(string categories)
         {
             Problem? problem = null;

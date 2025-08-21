@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomDSATrainer.Controllers
 {
+    /// <summary>
+    /// A controller that selects a random <see cref="Problem"/> for revision.
+    /// </summary>
     [ApiController]
     [Route("api/revision")]
     public class RevisionController : ControllerBase
