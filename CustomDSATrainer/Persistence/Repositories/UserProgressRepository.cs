@@ -10,10 +10,10 @@ namespace CustomDSATrainer.Persistance.Repositories
     /// </summary>
     public class UserProgressRepository : IUserProgressRepository
     {
-        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
-        public UserProgressRepository (IDbContextFactory<ProjectDbContext> contextFactory)
+        private readonly ProjectDbContext _context;
+        public UserProgressRepository(ProjectDbContext context)
         {
-            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null");
+            _context = context ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
         }
 
         /// <summary>
@@ -24,40 +24,35 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// <param name="submission">The submission for the problem.</param>
         public async void UpdateProblemData(Problem problem, Submission submission)
         {
-            using (var context = await _contextFactory.CreateDbContextAsync())
-            {
-                var user = await context.UserProgress.FirstOrDefaultAsync(u => u.Id == 1); // To be changes for more users
+            var user = await _context.UserProgress.FirstOrDefaultAsync(u => u.Id == 1); // To be changes for more users
 
-                if (user != null)
+            if (user != null)
+            {
+                if (problem.Status == ProblemStatus.NotTried)
                 {
-                    if (problem.Status == ProblemStatus.NotTried)
+                    if (submission.Result == SubmissionResult.Success)
                     {
-                        if (submission.Result == SubmissionResult.Success)
-                        {
-                            user.TotalSolvedProblems++;
-                        }
-                        else
-                        {
-                            user.TotalUnsolvedProblems++;
-                        }
+                        user.TotalSolvedProblems++;
                     }
-                    else if (problem.Status != ProblemStatus.Solved)
+                    else
                     {
-                        if (submission.Result == SubmissionResult.Success)
-                        {
-                            user.TotalSolvedProblems++;
-                            user.TotalUnsolvedProblems--;
-                        }
+                        user.TotalUnsolvedProblems++;
                     }
                 }
-
-                if (submission.Result == SubmissionResult.Success)
-                    problem.Status = ProblemStatus.Solved;
                 else if (problem.Status != ProblemStatus.Solved)
-                    problem.Status = ProblemStatus.Unsolved;
-
-                await context.SaveChangesAsync();
+                {
+                    if (submission.Result == SubmissionResult.Success)
+                    {
+                        user.TotalSolvedProblems++;
+                        user.TotalUnsolvedProblems--;
+                    }
+                }
             }
+
+            if (submission.Result == SubmissionResult.Success)
+                problem.Status = ProblemStatus.Solved;
+            else if (problem.Status != ProblemStatus.Solved)
+                problem.Status = ProblemStatus.Unsolved;
         }
     }
 }

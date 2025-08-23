@@ -1,24 +1,32 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
+using System.Threading.Tasks;
 
 namespace CustomDSATrainer.Application.Services
 {
     public class AIReviewService : IAIReviewService
     {
-        private readonly IAIReviewRepository _aiReviewRepository;
-        public AIReviewService(IAIReviewRepository aiReviewRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public AIReviewService(IUnitOfWork unitOfWork)
         {
-            _aiReviewRepository = aiReviewRepository ?? throw new ArgumentNullException("AIReview repository cannot be null.");
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException("UnitOfWork cannot be null.");
         }
 
         /// <summary>
         /// Saves an <see cref="AIReview"/> to the database.
         /// </summary>
         /// <param name="aiReview"></param>
-        public void SaveToDatabase(AIReview aiReview)
+        public async Task SaveToDatabase(AIReview aiReview)
         {
-            _aiReviewRepository.SaveToDatabase(aiReview);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                _unitOfWork.AIReviewRepository.SaveToDatabase(aiReview);
+                await _unitOfWork.CommitAsync();
+            }
+            catch { await _unitOfWork.RollbackTransactionAsync(); }
         }
     }
 }

@@ -5,6 +5,6 @@ namespace CustomDSATrainer.Domain.Interfaces.Services
     public interface ITestCaseService
     {
         TestCaseVerdict InitTestCase(TestCase testCase);
-        void SaveToDatabase(TestCase testCase);
+        Task SaveToDatabase(TestCase testCase);
     }
 }

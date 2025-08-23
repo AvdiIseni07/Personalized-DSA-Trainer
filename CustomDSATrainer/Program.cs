@@ -2,9 +2,12 @@ using CustomDSATrainer.Application;
 using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
 using CustomDSATrainer.Middleware;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Persistance.Repositories;
+using CustomDSATrainer.Persistence.Repositories;
+using CustomDSATrainer.Persistence.UnitOfWork;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
@@ -18,6 +21,7 @@ builder.Services.AddDbContextFactory<ProjectDbContext>(options =>
 builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<ISeedingService, SeedingService>();
 builder.Services.AddSingleton<ICurrentActiveProblemService, CurrentActiveProblemService>();
+builder.Services.AddSingleton<ICurrentUserProgress, CurrentUserProgressService>();
 
 builder.Services.AddTransient<ISubmissionService, SubmissionService>();
 builder.Services.AddTransient<IAIReviewService, AIReviewService>();
@@ -29,11 +33,7 @@ builder.Services.AddTransient<IActivityLogService, ActivityLogService>();
 builder.Services.AddTransient<IProblemGeneratorService, ProblemGeneratorService>();
 builder.Services.AddScoped<IProblemService, ProblemService>();
 
-builder.Services.AddScoped<IProblemRepository, ProblemRespository>();
-builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
-builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
-builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
-builder.Services.AddScoped<IUserProgressRepository, UserProgressRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -65,10 +65,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-//UserHandler.InitUser();
-//var activityLogger = app.Services.GetRequiredService<ActivityLogService>();
-//activityLogger.LogToday();
 
 app.Run();
 

@@ -1,9 +1,13 @@
-﻿using CustomDSATrainer.Domain;
+﻿using Azure.Identity;
+using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
 using FluentValidation.Results;
+using System.Numerics;
+using System.Threading.Tasks;
 namespace CustomDSATrainer.Application.Services
 {
     /// <summary>
@@ -12,12 +16,12 @@ namespace CustomDSATrainer.Application.Services
     public class SubmissionService : ISubmissionService
     {
         private readonly ITestCaseService _testCaseService;
-        private readonly ISubmissionRepository _submissionRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private const int TEST_CASE_AMOUNT = 7;
-        public SubmissionService(ITestCaseService testCaseService, ISubmissionRepository submissionRepository)
+        public SubmissionService(ITestCaseService testCaseService, IUnitOfWork unitOfWork)
         {
             _testCaseService = testCaseService              ?? throw new ArgumentNullException(nameof(testCaseService), "TestCaseService cannot be null.");
-            _submissionRepository = submissionRepository    ?? throw new ArgumentNullException(nameof(submissionRepository), "SubmissionRepository cannot be null");
+            _unitOfWork = unitOfWork                        ?? throw new ArgumentNullException(nameof(unitOfWork), "SubmissionRepository cannot be null");
         }
         
         /// <summary>
@@ -81,9 +85,15 @@ namespace CustomDSATrainer.Application.Services
         /// Saves a <see cref="Submission"/> to the database.
         /// </summary>
         /// <param name="submission">The <see cref="Submission"/>that needs to be saved.</param>
-        public void SaveToDatabase(Submission submission)
+        public async Task SaveToDatabase(Submission submission)
         {
-            _submissionRepository.SaveToDatabase(submission);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                _unitOfWork.SubmissionRepository.SaveToDatabase(submission);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+            } catch { await _unitOfWork.RollbackTransactionAsync(); }
         }
     }
 }

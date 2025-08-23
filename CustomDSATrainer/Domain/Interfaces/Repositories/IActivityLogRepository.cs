@@ -2,6 +2,6 @@
 {
     public interface IActivityLogRepository
     {
-        void LogToday();
+        Task LogToday();
     }
 }

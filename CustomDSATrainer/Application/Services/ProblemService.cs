@@ -2,8 +2,11 @@
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
+using CustomDSATrainer.Persistence.UnitOfWork;
 using FluentValidation.Results;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -18,27 +21,21 @@ namespace CustomDSATrainer.Application.Services
     public class ProblemService : IProblemService
     {
         private readonly ISubmissionService _submissionService;
-        private readonly IProblemService _problemService;
         private readonly IPythonAIService _pythonAIService;
         private ICurrentActiveProblemService _currentActiveProblemService;
 
-        private readonly IProblemRepository _problemRepository;
-        private readonly IUserProgressRepository _userProgressRepository;
-        private readonly IAIReviewRepository _aiReviewRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         private readonly ILogger<ProblemService> _logger;
 
         public ProblemService(
-            ISubmissionService submissionService, IProblemService problemService,ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
-            IProblemRepository problemRepository, IUserProgressRepository userProgressRepository, IAIReviewRepository aIReviewRepository, ILogger<ProblemService> logger)
+            ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
+            IUnitOfWork unitOfWork, ILogger<ProblemService> logger)
         {
             _submissionService = submissionService                      ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
-            _problemService = problemService                            ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null");
             _currentActiveProblemService = currentActiveProblemService  ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
             _pythonAIService = pythonAIService                          ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
-            _problemRepository = problemRepository                      ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null.");
-            _userProgressRepository = userProgressRepository            ?? throw new ArgumentNullException(nameof(userProgressRepository), "UserProgressRepository cannot be null");
-            _aiReviewRepository = aIReviewRepository                    ?? throw new ArgumentNullException(nameof(aIReviewRepository), "AIReviewRepository cannot be null"); 
+            _unitOfWork = unitOfWork                                    ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
             _logger = logger                                            ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
         }
         
@@ -56,6 +53,7 @@ namespace CustomDSATrainer.Application.Services
         public void SubmitProblem(Problem problem, string pathToExe)
         {
             if (problem == null) { throw new ArgumentNullException(nameof(problem), "Problem cannot be null."); }
+            _logger.LogInformation("Submitting problem with ID: {ProblemId}", problem.Id);
 
             Submission submission = new Submission { ProblemId = problem.Id, Id = 0, PathToExecutable = pathToExe };
 
@@ -66,11 +64,11 @@ namespace CustomDSATrainer.Application.Services
             {
                 throw new Exception(validationResult.Errors.ToArray().ToString());
             }
-            
+
             _submissionService.RunSumbission(submission, problem.Inputs, problem.Outputs);
             _submissionService.SaveToDatabase(submission);
-
-            _userProgressRepository.UpdateProblemData(problem, submission);
+            
+            _logger.LogInformation("Problem {ProblemId} was submitted susccessfully.", problem.Id);
         }
         
         /// <summary>
@@ -81,14 +79,15 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>Whether the <see cref="Problem"/> has been loaded successfully.</returns>
         public async Task<bool> LoadProblem(int id)
         {
+            _logger.LogInformation("Trying to load problem {ProblemId}", id);
             Problem? currentProblem = _currentActiveProblemService.CurrentProblem;
             if (currentProblem != null && currentProblem.Status == ProblemStatus.Solving)
             {
                 currentProblem.Status = ProblemStatus.WasSolving;
-                _problemService.SaveToDatabase(currentProblem);
+                await SaveToDatabase(currentProblem);
             }
 
-            currentProblem = await _problemRepository.GetFromId(id);
+            currentProblem = await _unitOfWork.ProblemRepository.GetFromId(id);
             _currentActiveProblemService.CurrentProblem = currentProblem;
 
             if (currentProblem != null)
@@ -96,14 +95,18 @@ namespace CustomDSATrainer.Application.Services
                 if (currentProblem.Status == ProblemStatus.Unsolved)
                 {
                     currentProblem.Status = ProblemStatus.Solving;
-                    SaveToDatabase(currentProblem);
+                    await SaveToDatabase(currentProblem);
                 }
 
                 string[] inputs = currentProblem.Inputs.Split('!');
                 string[] outputs = currentProblem.Outputs.Split('!');
 
+                _logger.LogInformation("Problem {ProblemId} was loaded successfully.", id);
+
                 return true;
             }
+
+            _logger.LogInformation("There is no problem with ID {ProblemId}", id);
 
             return false;
         }
@@ -115,10 +118,14 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="problem">The selected <see cref="Problem"/>.</param>
         /// <param name="pathToSource">The source code that should be reviewed.</param>
         /// <returns>The generated review.</returns>
-        public string? AiReview(Problem problem, string pathToSource)
+        public async Task<string?> AiReview(Problem problem, string pathToSource)
         {
+            _logger.LogInformation("Creating an AI review for problem {ProblemId}. Path to source: {PathToSource}", problem.Id, pathToSource);
             if (!File.Exists(pathToSource))
+            {
+                _logger.LogError("'{PathToSource}' doesn't exit.", pathToSource);
                 return null;
+            }
 
             AIReview currentReview = new AIReview { ProblemId = problem.Id, PathToCPPFile = pathToSource, ProblemStatus = problem.Status };
 
@@ -130,7 +137,16 @@ namespace CustomDSATrainer.Application.Services
                 string userSource = File.ReadAllText(Path.GetFullPath(pathToSource));
                 currentReview.Review = _pythonAIService.ReviewProblem(problem.Statement!, userSource, problem.Status == ProblemStatus.Solved);
 
-                _aiReviewRepository.SaveToDatabase(currentReview);
+                _logger.LogInformation("Successfully created AI Review ({ReviewId}) for problem {ProblemId}", currentReview.Id, problem.Id);
+
+                await _unitOfWork.BeginTransactionAsync();
+                try
+                {
+                    _unitOfWork.AIReviewRepository.SaveToDatabase(currentReview);
+                    await _unitOfWork.CommitAsync();
+                    await _unitOfWork.CommitTransactionAsync();
+                }
+                catch { await _unitOfWork.RollbackTransactionAsync(); }
             }
             catch (Exception ex)
             {
@@ -144,9 +160,16 @@ namespace CustomDSATrainer.Application.Services
         /// Saves a <see cref="Problem"/> to the database.
         /// </summary>
         /// <param name="problem">The <see cref="Problem"/> that should be saved.</param>
-        public void SaveToDatabase(Problem problem)
+        public async Task SaveToDatabase(Problem problem)
         {
-            _problemRepository.SaveToDatabase(problem);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                _unitOfWork.ProblemRepository.SaveToDatabase(problem);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+            }
+            catch { await _unitOfWork.RollbackTransactionAsync(); }
         }
     }
 }

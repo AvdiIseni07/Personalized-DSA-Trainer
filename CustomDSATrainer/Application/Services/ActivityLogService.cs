@@ -1,18 +1,24 @@
 ﻿using CustomDSATrainer.Domain.Interfaces;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Persistance;
+using CustomDSATrainer.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace CustomDSATrainer.Application.Services
 {
     public class ActivityLogService : IActivityLogService
     {
-        private readonly IDbContextFactory<ProjectDbContext> _dbContextFactory;
+        private readonly ProjectDbContext _context;
+        private readonly ICurrentUserProgress _currentUser;
+        private readonly ILogger<ActivityLogService> _logger;
         private const int DATE_PREFIX = 10;
-        public ActivityLogService(IDbContextFactory<ProjectDbContext> dbContextFactory)
+        public ActivityLogService(ProjectDbContext context, ICurrentUserProgress currentUser, ILogger<ActivityLogService> logger)
         {
-            _dbContextFactory = dbContextFactory ?? throw new ArgumentNullException(nameof(dbContextFactory), "DbContextFactory cannot be null");
+            _context = context          ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
+            _currentUser = currentUser  ?? throw new ArgumentNullException(nameof(currentUser), "CurrentUser cannot be null.");
+            _logger = logger            ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null.");
         }
         /// <summary>
         /// First checks if the current day is already saved into the user's database. If it isn't it then adds it.
@@ -21,12 +27,12 @@ namespace CustomDSATrainer.Application.Services
         /// </summary>
         public void LogToday()
         {
-            using (var context = _dbContextFactory.CreateDbContext())
-            {
+            _logger.LogInformation("Logging today.");
+
                 string date = DateTime.Now.ToString();
                 date = date.Substring(0, DATE_PREFIX);
 
-                var userFound = context.UserProgress.FirstOrDefault(u => u.Id == 1); // Later to be changed for more users
+                var userFound = _context.UserProgress.FirstOrDefault(u => u.Id == _currentUser.CurrentUserId);
                 if (userFound != null)
                 {
                     List<string> daysLogged = userFound.DaysLogged.Split(',').ToList();
@@ -51,8 +57,7 @@ namespace CustomDSATrainer.Application.Services
                             userFound.LoggingStreak = 1;
                         }
 
-                        context.SaveChanges();
-                    }
+                        _context.SaveChanges();
                 }
             }
         }

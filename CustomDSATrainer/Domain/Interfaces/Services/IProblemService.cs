@@ -4,7 +4,7 @@
     {
         void SubmitProblem(Problem problem, string pathToExe);
         Task<bool> LoadProblem(int id);
-        string? AiReview(Problem problem, string pathToSource);
-        void SaveToDatabase(Problem problem);
+        Task<string?> AiReview(Problem problem, string pathToSource);
+        Task SaveToDatabase(Problem problem);
     }
 }

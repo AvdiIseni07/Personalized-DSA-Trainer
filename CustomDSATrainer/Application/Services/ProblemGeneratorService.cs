@@ -1,6 +1,7 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
 using FluentValidation.Results;
 
@@ -13,14 +14,16 @@ namespace CustomDSATrainer.Application.Services
     {
         private readonly IPythonAIService _pythonAIService;
         private readonly IProblemService _problemService;
-        private readonly IProblemRepository _problemRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ProblemGeneratorService> _logger;
 
         private const int TITLE_PREFIX_LENGTH = 7;
-        public ProblemGeneratorService(IPythonAIService pythonAIService, IProblemService problemService, IProblemRepository problemRepository)
+        public ProblemGeneratorService(IPythonAIService pythonAIService, IProblemService problemService, IUnitOfWork unitOfWork, ILogger<ProblemGeneratorService> logger)
         {
             _pythonAIService = pythonAIService      ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
             _problemService = problemService        ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
-            _problemRepository = problemRepository  ?? throw new ArgumentNullException(nameof(problemRepository), "ProblemRepository cannot be null");
+            _unitOfWork = unitOfWork                ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null");
+            _logger = logger                        ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null.");
         }
 
         /// <summary>
@@ -84,6 +87,7 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>The generated <see cref="Problem"/>, if generated successfully.</returns>
         public Problem GenerateFromPrompt(string categories, string difficulty)
         {
+            _logger.LogInformation("Generating from promp: Categories = {Cat}    Difficulty: {Diff}", categories, difficulty);
             List<string> problemData = _pythonAIService.GenerateProblemFromPrompt(categories, difficulty);
 
             return InitProblem(problemData);
@@ -97,8 +101,9 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>The generated <see cref="Problem"/>, if generated successfully</returns>
         public async Task<Problem?> GenerateProblemFromUnsolved()
         {
+            _logger.LogInformation("Generating problem from unsolved");
             Problem? generatedProblem = null;
-            Tuple<string, string> data = await _problemRepository.GetUnsolvedData();
+            Tuple<string, string> data = await _unitOfWork.ProblemRepository.GetUnsolvedData();
 
             List<string> problemData = _pythonAIService.GenerateProblemFromUnsolved(data.Item1, data.Item2);
             generatedProblem = InitProblem(problemData);
@@ -113,7 +118,8 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>The selected <see cref="Problem"/>, if the selection process is successful</returns>
         public async Task<Problem?> Revision()
         {
-            Problem? generatedProblem = await _problemRepository.GetRevision();
+            _logger.LogInformation("Getting problem for revision");
+            Problem? generatedProblem = await _unitOfWork.ProblemRepository.GetRevision();
 
             return generatedProblem;
         }
@@ -125,7 +131,7 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>The selected <see cref="Problem"/>, if the selection process is successful</returns>
         public async Task<Problem?> RevisionWithCategories(string categories)
         {
-            Problem? generatedProblem = await _problemRepository.GetRevisionWithCategories(categories);
+            Problem? generatedProblem = await _unitOfWork.ProblemRepository.GetRevisionWithCategories(categories);
 
             return generatedProblem;
         }

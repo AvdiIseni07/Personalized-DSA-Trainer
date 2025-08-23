@@ -9,10 +9,10 @@ namespace CustomDSATrainer.Persistance.Repositories
     /// </summary>
     public class AIReviewRepository : IAIReviewRepository
     {
-        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
-        public AIReviewRepository(IDbContextFactory<ProjectDbContext> contextFactory)
+        private readonly ProjectDbContext _context;
+        public AIReviewRepository(ProjectDbContext context)
         {
-            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
+            _context = context ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
         }
 
         /// <summary>
@@ -22,20 +22,15 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// <param name="aiReview">The AIReview that needs to be saved.</param>
         public async void SaveToDatabase(AIReview aiReview)
         {
-            using (var context = await _contextFactory.CreateDbContextAsync())
+            var existingReview = await _context.AIReview.FindAsync(aiReview.Id);
+
+            if (existingReview == null)
             {
-                var existingReview = await context.AIReview.FindAsync(aiReview.Id);
-
-                if (existingReview == null)
-                {
-                    await context.AIReview.AddAsync(aiReview);
-                }
-                else
-                {
-                    context.Entry(existingReview).CurrentValues.SetValues(aiReview);
-                }
-
-                await context.SaveChangesAsync();
+                await _context.AIReview.AddAsync(aiReview);
+            }
+            else
+            {
+                _context.Entry(existingReview).CurrentValues.SetValues(aiReview);
             }
         }
     }

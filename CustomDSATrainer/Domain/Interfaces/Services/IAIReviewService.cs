@@ -2,6 +2,6 @@
 {
     public interface IAIReviewService
     {
-        void SaveToDatabase(AIReview aiReview);
+        Task SaveToDatabase(AIReview aiReview);
     }
 }

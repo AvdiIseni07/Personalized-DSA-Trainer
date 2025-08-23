@@ -9,10 +9,10 @@ namespace CustomDSATrainer.Persistance.Repositories
     /// </summary>
     public class SubmissionRepository : ISubmissionRepository
     {
-        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
-        public SubmissionRepository(IDbContextFactory<ProjectDbContext> contextFactory)
+        private readonly ProjectDbContext _context;
+        public SubmissionRepository(ProjectDbContext context)
         {
-            _contextFactory = contextFactory;
+            _context = context ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
         }
 
         /// <summary>
@@ -22,19 +22,14 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// <param name="submission">The submission that needs to be saved.</param>
         public async void SaveToDatabase(Submission submission)
         {
-            using (var context = await _contextFactory.CreateDbContextAsync())
+            var existingSubmission = await _context.Submissions.FindAsync(submission.Id);
+            if (existingSubmission == null)
             {
-                var existingSubmission = await context.Submissions.FindAsync(submission.Id);
-                if (existingSubmission == null)
-                {
-                    context.Submissions.Add(submission);
-                }
-                else
-                {
-                    context.Entry(existingSubmission).CurrentValues.SetValues(submission);
-                }
-
-                await context.SaveChangesAsync();
+                _context.Submissions.Add(submission);
+            }
+            else
+            {
+                _context.Entry(existingSubmission).CurrentValues.SetValues(submission);
             }
         }
     }

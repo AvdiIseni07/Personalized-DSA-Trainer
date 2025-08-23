@@ -9,10 +9,10 @@ namespace CustomDSATrainer.Persistance.Repositories
     /// </summary>
     public class TestCaseRepository : ITestCaseRepository
     {
-        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
-        public TestCaseRepository(IDbContextFactory<ProjectDbContext> contextFactory)
+        private readonly ProjectDbContext _context;
+        public TestCaseRepository(ProjectDbContext context)
         {
-            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
+            _context = context ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
         }
 
         /// <summary>
@@ -22,20 +22,15 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// <param name="testCase">The <see cref="TestCase"/> that needs to be saved.</param>
         public async void SaveToDatabase(TestCase testCase)
         {
-            using (var context = await _contextFactory.CreateDbContextAsync())
+            var existingTestCase = await _context.TestCase.FindAsync(testCase.Id);
+
+            if (existingTestCase == null)
             {
-                var existingTestCase = await context.TestCase.FindAsync(testCase.Id);
-
-                if (existingTestCase == null)
-                {
-                    context.TestCase.Add(testCase);
-                }
-                else
-                {
-                    context.Entry(existingTestCase).CurrentValues.SetValues(testCase);
-                }
-
-                await context.SaveChangesAsync();
+                _context.TestCase.Add(testCase);
+            }
+            else
+            {
+                _context.Entry(existingTestCase).CurrentValues.SetValues(testCase);
             }
         }
     }

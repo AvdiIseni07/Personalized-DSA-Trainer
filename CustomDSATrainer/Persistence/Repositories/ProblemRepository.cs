@@ -10,16 +10,16 @@ namespace CustomDSATrainer.Persistance.Repositories
     /// <summary>
     /// Repository for <see cref="Problem"/>
     /// </summary>
-    public class ProblemRespository : IProblemRepository
+    public class ProblemRepository : IProblemRepository
     {
-        private readonly IDbContextFactory<ProjectDbContext> _contextFactory;
+        private readonly ProjectDbContext _context;
         private Random random = new Random();
 
-        public ProblemRespository(IDbContextFactory<ProjectDbContext> contextFactory)
+        public ProblemRepository(ProjectDbContext context)
         {
-            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory), "ContextFactory cannot be null.");
+            _context = context ?? throw new ArgumentNullException(nameof(context), "DbContext cannot be null.");
         }
-        
+
         /// <summary>
         /// Tries to get a problem from the database from the given ID.
         /// </summary>
@@ -29,10 +29,7 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             Problem? problem = null;
 
-            using (var context = await _contextFactory.CreateDbContextAsync())
-            {
-                problem = await context.Problem.FirstOrDefaultAsync(p => p.Id == id);
-            }
+            problem = await _context.Problem.FirstOrDefaultAsync(p => p.Id == id);
 
             return problem;
         }
@@ -44,21 +41,19 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// <param name="problem">The problem that needs to be saved.</param>
         public async void SaveToDatabase(Problem problem)
         {
-            using (var context = await _contextFactory.CreateDbContextAsync())
+            var existingProblem = await _context.Problem.FindAsync(problem.Id);
+
+            if (existingProblem == null)
             {
-                var existingProblem = await context.Problem.FindAsync(problem.Id);
-
-                if (existingProblem == null)
-                {
-                    context.Problem.Add(problem);
-                }
-                else
-                {
-                    context.Entry(existingProblem).CurrentValues.SetValues(problem);
-                }
-
-                await context.SaveChangesAsync();
+                _context.Problem.Add(problem);
             }
+            else
+            {
+                _context.Entry(existingProblem).CurrentValues.SetValues(problem);
+            }
+
+            await _context.SaveChangesAsync();
+
         }
 
         /// <summary>
@@ -70,41 +65,39 @@ namespace CustomDSATrainer.Persistance.Repositories
         public async Task<Tuple<string, string>> GetUnsolvedData()
         {
             string prompt = string.Empty, difficulty = string.Empty;
-            using (var context = await _contextFactory.CreateDbContextAsync())
+            var results = await _context.Problem.Where(p => p.Status == ProblemStatus.Unsolved).ToListAsync();
+            List<string> categories = new List<string>();
+            List<string> difficulties = new List<string>();
+
+            foreach (var problem in results)
             {
-                var results = await context.Problem.Where(p => p.Status == ProblemStatus.Unsolved).ToListAsync();
-                List<string> categories = new List<string>();
-                List<string> difficulties = new List<string>();
+                if (problem.Categories == null || problem.Difficulty == null)
+                    continue;
 
-                foreach (var problem in results)
+                string[] currentCategories = problem.Categories.Split(',');
+                foreach (string category in currentCategories)
                 {
-                    if (problem.Categories == null || problem.Difficulty == null)
-                        continue;
-
-                    string[] currentCategories = problem.Categories.Split(',');
-                    foreach (string category in currentCategories)
-                    {
-                        if (!categories.Contains(category))
-                            categories.Add(category);
-                    }
-
-                    if (!difficulties.Contains(problem.Difficulty))
-                        difficulties.Add(problem.Difficulty);
+                    if (!categories.Contains(category))
+                        categories.Add(category);
                 }
 
-                if (categories.Count > 0)
-                {
-                    foreach (string category in categories)
-                    {
-                        if (prompt == string.Empty)
-                            prompt = category;
-                        else
-                            prompt += ", " + category;
-                    }
+                if (!difficulties.Contains(problem.Difficulty))
+                    difficulties.Add(problem.Difficulty);
+            }
 
-                    int difficultyIndex = random.Next(0, difficulties.Count);
-                    difficulty = difficulties[difficultyIndex];
+            if (categories.Count > 0)
+            {
+                foreach (string category in categories)
+                {
+                    if (prompt == string.Empty)
+                        prompt = category;
+                    else
+                        prompt += ", " + category;
                 }
+
+                int difficultyIndex = random.Next(0, difficulties.Count);
+                difficulty = difficulties[difficultyIndex];
+
             }
 
             return new Tuple<string, string>(prompt, difficulty);
@@ -119,15 +112,12 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             Problem? problem = null;
 
-            using (var context = await _contextFactory.CreateDbContextAsync())
-            {
-                var results = await context.Problem.Where(p => p.Status == ProblemStatus.Solved).ToListAsync();
+            var results = await _context.Problem.Where(p => p.Status == ProblemStatus.Solved).ToListAsync();
 
-                if (results.Count > 0)
-                {
-                    int chosenProblem = random.Next(0, results.Count);
-                    problem = results[chosenProblem];
-                }
+            if (results.Count > 0)
+            {
+                int chosenProblem = random.Next(0, results.Count);
+                problem = results[chosenProblem];
             }
 
             return problem;
@@ -143,15 +133,12 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             Problem? problem = null;
 
-            using (var context = await _contextFactory.CreateDbContextAsync())
-            {
-                var results = await context.Problem.Where(p => p.Categories.Contains(categories)).ToListAsync();
+            var results = await _context.Problem.Where(p => p.Categories.Contains(categories)).ToListAsync();
 
-                if (results.Count > 0)
-                {
-                    int chosenProblem = random.Next(0, results.Count);
-                    problem = results[chosenProblem];
-                }
+            if (results.Count > 0)
+            {
+                int chosenProblem = random.Next(0, results.Count);
+                problem = results[chosenProblem];
             }
 
             return problem;

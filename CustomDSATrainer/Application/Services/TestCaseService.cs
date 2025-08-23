@@ -2,6 +2,8 @@
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using CustomDSATrainer.Domain.UnitOfWork;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -17,12 +19,12 @@ namespace CustomDSATrainer.Application.Services
     {
         private IUserOutputService _userOutputService;
         private readonly IUserSourceLinkerService _userSourceLinkerService;
-        private readonly ITestCaseRepository _testCaseRepository;
-        public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, ITestCaseRepository testCaseRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, IUnitOfWork unitOfWork)
         {
             _userOutputService = userOutputService              ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
             _userSourceLinkerService = userSourceLinkerService  ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");
-            _testCaseRepository = testCaseRepository            ?? throw new ArgumentNullException(nameof(testCaseRepository), "TestCaseRepository cannot be null.");
+            _unitOfWork = unitOfWork                           ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
         }
 
         /// <summary>
@@ -84,9 +86,17 @@ namespace CustomDSATrainer.Application.Services
         /// Saves a <see cref="TestCase"/> to the database.
         /// </summary>
         /// <param name="testCase">The test case that needs to be saved.</param>
-        public void SaveToDatabase(TestCase testCase)
+        public async Task SaveToDatabase(TestCase testCase)
         {
-            _testCaseRepository.SaveToDatabase(testCase);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                
+                _unitOfWork.TestCaseRepository.SaveToDatabase(testCase);
+                await _unitOfWork.CommitAsync();
+                await _unitOfWork.CommitTransactionAsync();
+            }
+            catch { await _unitOfWork.RollbackTransactionAsync(); }
         }
     }
 }
