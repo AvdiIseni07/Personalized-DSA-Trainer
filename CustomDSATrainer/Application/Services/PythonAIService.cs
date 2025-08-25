@@ -1,6 +1,9 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Services;
+using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -14,9 +17,21 @@ namespace CustomDSATrainer.Application.Services
     /// </summary>
     public class PythonAIService : IPythonAIService
     {
-        private readonly string pathToPythonProblemGen = "AIService/ProblemGenerator.py";
-        private readonly string pathToPythonUnsolvedReview = "AIService/UnsolvedCodeReviewer.py";
-        private readonly string pathToPythonSolvedReview = "AIService/SolvedCodeReviewer.py";
+        private readonly string _pathToPythonProblemGen;
+        private readonly string _pathToPythonUnsolvedReview;
+        private readonly string _pathToPythonSolvedReview;
+
+        private readonly ILogger<PythonAIService> _logger;
+
+        private static int TIMEOUT_LIMIT = 60000; // in milliseconds
+
+        public PythonAIService(IConfiguration configuration, ILogger<PythonAIService> logger)
+        {
+            _pathToPythonProblemGen = configuration["PythonData:ProblemGenerator"] ?? throw new Exception("Problem generator path cannot be null.");
+            _pathToPythonSolvedReview = configuration["PythonData:SolvedReview"]    ?? throw new Exception("SolvedReview path cannot be null");
+            _pathToPythonUnsolvedReview = configuration["PythonData:UnsolvedReview"] ?? throw new Exception("UnsolvedReview path cannot be null.");
+            _logger = logger;
+        }
 
         /// <summary>
         /// Creates and returns a <see cref="ProcessStartInfo"/> to execute a given python script.
@@ -49,32 +64,50 @@ namespace CustomDSATrainer.Application.Services
         /// <exception cref="ArgumentNullException">The python script has not produced any output.</exception>
         public List<string> GenerateProblemFromPrompt(string categories, string difficulty)
         {
-            ProcessStartInfo startInfo = GetStartInfo(pathToPythonProblemGen);
+            _logger.LogInformation("Problem generator has been called.");
+            ProcessStartInfo startInfo = GetStartInfo(_pathToPythonProblemGen);
 
             string adaptedLine = $"Task: Generate a competitive-programming (LeetCode/Codeforces) style problem about these techniques, data structures and algorithms: {categories}. The difficulty should be: {difficulty}";
             List<string> output = new List<string>();
 
-            using (var  process = new Process { StartInfo = startInfo })
+            try
             {
-                process.Start();
-
-                process.StandardInput.WriteLine(adaptedLine);
-                process.StandardInput.Close();
-
-                while (!process.StandardOutput.EndOfStream)
+                using (var process = new Process { StartInfo = startInfo })
                 {
-                    string line = process.StandardOutput.ReadLine() ?? throw new ArgumentNullException(nameof(line), "Output cannot be null.");
-                    output.Add(line);
+                    process.Start();
+
+                    process.StandardInput.WriteLine(adaptedLine);
+                    process.StandardInput.Close();
+
+                    if (!process.WaitForExit(TIMEOUT_LIMIT))
+                    {
+                        process.Kill(true);
+                      
+                        throw new TimeoutException($"Python script timed out after {TIMEOUT_LIMIT} milliseconds.");
+                    }
+
+                    while (!process.StandardOutput.EndOfStream)
+                    {
+                        string line = process.StandardOutput.ReadLine() ?? throw new ArgumentNullException(nameof(line), "Output cannot be null.");
+                        output.Add(line);
+                    }
+
+                    output[0] = output[0].Replace('@', '\n');
+                    output.Add(categories);
+                    output.Add(difficulty);
+
+                    string error = process.StandardError.ReadToEnd();
+
+                    process.WaitForExit();
+
+                    if (!error.IsNullOrEmpty() || process.ExitCode != 0)
+                    {
+                        throw new Exception(error);
+
+                    }
                 }
-                process.StandardOutput.Close();
-
-                
-                output[0] = output[0].Replace('@', '\n');
-                output.Add(categories);
-                output.Add(difficulty);
-
-                process.WaitForExit();
             }
+            catch (Exception e) { _logger.LogError(e, "Error while runnin python script."); }
 
             return output;
         }
@@ -103,24 +136,34 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="userSource">The user-generated source code.</param>
         /// <param name="solved">Whether the selected problem has been solved or not.</param>
         /// <returns>The generated review for the given problem and source code.</returns>
-        public string ReviewProblem(string problemStatement, string userSource, bool solved)
+        public string? ReviewProblem(string problemStatement, string userSource, bool solved)
         {
-            ProcessStartInfo startInfo = solved ? GetStartInfo(pathToPythonSolvedReview) : GetStartInfo(pathToPythonUnsolvedReview);
+            ProcessStartInfo startInfo = solved ? GetStartInfo(_pathToPythonSolvedReview) : GetStartInfo(_pathToPythonUnsolvedReview);
 
-            string review = string.Empty;
-            using (var process = new Process { StartInfo = startInfo })
+            string? review = null;
+            try
             {
-                process.Start();
+                using (var process = new Process { StartInfo = startInfo })
+                {
+                    process.Start();
 
-                process.StandardInput.Write(problemStatement);
-                process.StandardInput.Write("----------");
-                process.StandardInput.Write(userSource);
-                process.StandardInput.Close();
+                    process.StandardInput.Write(problemStatement);
+                    process.StandardInput.Write("----------");
+                    process.StandardInput.Write(userSource);
+                    process.StandardInput.Close();
 
-                review = process.StandardOutput.ReadToEnd();
+                    if (!process.WaitForExit(TIMEOUT_LIMIT))
+                    {
+                        process.Kill(true);
+                        throw new TimeoutException($"Review timed out after {TIMEOUT_LIMIT} milliseconds.");
+                    }
 
-                process.WaitForExit();
-            }
+                    review = process.StandardOutput.ReadToEnd();
+
+                    process.WaitForExit();
+                }
+            } catch (TimeoutException e){ _logger.LogError(e, "Review time out."); }
+            
 
             return review;
         }

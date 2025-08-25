@@ -3,6 +3,7 @@ using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Persistance.Repositories;
+using CustomDSATrainer.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -20,7 +21,7 @@ namespace CustomDSATrainer.Persistence.UnitOfWork
         public ISubmissionRepository SubmissionRepository { get; }
         public ITestCaseRepository TestCaseRepository { get; }
         public IUserProgressRepository UserProgressRepository { get; }
-
+        public ISearchRepository SearchRepository { get; }
         public UnitOfWork(IDbContextFactory<ProjectDbContext> contextFactory)
         {
             _context = contextFactory.CreateDbContext();
@@ -30,6 +31,7 @@ namespace CustomDSATrainer.Persistence.UnitOfWork
             SubmissionRepository = new SubmissionRepository(_context);
             TestCaseRepository = new TestCaseRepository(_context);
             UserProgressRepository = new UserProgressRepository(_context);
+            SearchRepository = new SearchRepository(_context);
         }
 
         public async Task<int> CommitAsync() => await _context.SaveChangesAsync();

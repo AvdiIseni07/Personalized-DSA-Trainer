@@ -7,5 +7,6 @@
         Task<Tuple<string, string>> GetUnsolvedData();
         Task<Problem?> GetRevision();
         Task<Problem?> GetRevisionWithCategories(string categories);
+        Task<List<int>> GetFromSearch(string query);
     }
 }

@@ -1,20 +1,13 @@
 using Asp.Versioning;
-using CustomDSATrainer.Application;
 using CustomDSATrainer.Application.Services;
-using CustomDSATrainer.Domain.ApiResponse;
-using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Middleware;
 using CustomDSATrainer.Persistance;
-using CustomDSATrainer.Persistance.Repositories;
 using CustomDSATrainer.Persistence.Repositories;
 using CustomDSATrainer.Persistence.UnitOfWork;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);

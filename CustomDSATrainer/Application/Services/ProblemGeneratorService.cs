@@ -85,12 +85,16 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="categories">The categories that the problem shuld have.</param>
         /// <param name="difficulty">The difficilty of the problem.</param>
         /// <returns>The generated <see cref="Problem"/>, if generated successfully.</returns>
-        public Problem GenerateFromPrompt(string categories, string difficulty)
+        public Problem? GenerateFromPrompt(string categories, string difficulty)
         {
             _logger.LogInformation("Generating from promp: Categories = {Cat}    Difficulty: {Diff}", categories, difficulty);
-            List<string> problemData = _pythonAIService.GenerateProblemFromPrompt(categories, difficulty);
+            List<string>? problemData = null;
 
-            return InitProblem(problemData);
+            try {problemData = _pythonAIService.GenerateProblemFromPrompt(categories, difficulty); } catch { }
+
+            if (problemData != null)
+                return InitProblem(problemData);
+            return null;
         }
 
         /// <summary>

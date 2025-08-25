@@ -11,6 +11,7 @@ namespace CustomDSATrainer.Persistance
         public DbSet<Submission> Submissions{ get; set; }
         public DbSet<TestCase> TestCase{ get; set; }
         public DbSet<AIReview> AIReview {  get; set; }
+        public DbSet<Search> Search { get; set; }
         private readonly SeedingService _seedingService;
         public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
         { 

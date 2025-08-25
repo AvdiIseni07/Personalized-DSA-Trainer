@@ -12,6 +12,7 @@ namespace CustomDSATrainer.Domain.Interfaces.UnitOfWork
         ISubmissionRepository SubmissionRepository { get; }
         ITestCaseRepository TestCaseRepository { get; }
         IUserProgressRepository UserProgressRepository { get; }
+        ISearchRepository SearchRepository { get; }
 
         Task<int> CommitAsync();
         Task BeginTransactionAsync();

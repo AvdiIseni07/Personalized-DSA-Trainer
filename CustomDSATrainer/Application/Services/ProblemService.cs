@@ -135,7 +135,7 @@ namespace CustomDSATrainer.Application.Services
             try
             {
                 string userSource = File.ReadAllText(Path.GetFullPath(pathToSource));
-                currentReview.Review = _pythonAIService.ReviewProblem(problem.Statement!, userSource, problem.Status == ProblemStatus.Solved);
+                currentReview.Review = _pythonAIService.ReviewProblem(problem.Statement!, userSource, problem.Status == ProblemStatus.Solved) ?? "Failed to generate review";
 
                 _logger.LogInformation("Successfully created AI Review ({ReviewId}) for problem {ProblemId}", currentReview.Id, problem.Id);
 

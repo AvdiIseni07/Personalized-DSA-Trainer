@@ -34,6 +34,15 @@ namespace CustomDSATrainer.Persistance.Repositories
             return problem;
         }
 
+        public async Task<List<int>> GetFromSearch(string query)
+        {
+            List<int> results = await _context.Problem.Where(p => p.Title.Contains(query) || p.Statement.Contains(query))
+                .OrderBy(p => p.Difficulty == "Easy" ? 1 : p.Difficulty == "Medium" ? 2 : p.Difficulty == "Hard" ? 3 : 4)
+                .Select(p => p.Id).ToListAsync();
+
+            return results;
+        }
+
         /// <summary>
         /// Saves a <see cref="Problem"/> to the database.
         /// If it already exists, it only updates the values.

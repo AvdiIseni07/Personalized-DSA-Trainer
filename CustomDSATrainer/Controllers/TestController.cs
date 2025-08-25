@@ -26,7 +26,7 @@ namespace CustomDSATrainer.Controllers
             _currentActiveProblemService = currentActiveProblemService  ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null."); 
         }
 
-        [[MapToApiVersion(1)]]
+        [MapToApiVersion(1)]
         [HttpPost("{ExePath}")]
         public IActionResult GetExePath(string ExePath)
         {

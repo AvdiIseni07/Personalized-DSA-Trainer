@@ -26,15 +26,18 @@ namespace CustomDSATrainer.Controllers
         [HttpPost("{Categories}/{Difficulty}")]
         public IActionResult CreateProblemFromCategory(string Categories, string Difficulty)
         {
-            Problem problem = _problemGeneratorService.GenerateFromPrompt(Categories, Difficulty);
+            Problem? problem = _problemGeneratorService.GenerateFromPrompt(Categories, Difficulty);
 
-            return Ok(new ProblemDTO
-            {
-                Id = problem.Id,
-                Title = problem.Title ?? "",
-                Statement = problem.Statement ?? "",
-                CreatedAt = DateTime.Now.Date,
-            });
+            if (problem != null)
+                return Ok(new ProblemDTO
+                {
+                    Id = problem.Id,
+                    Title = problem.Title ?? "",
+                    Statement = problem.Statement ?? "",
+                    CreatedAt = DateTime.Now.Date,
+                });
+            else
+                return BadRequest("Problem could not be generated.");
         }
     }
 }
