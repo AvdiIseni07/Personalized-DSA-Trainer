@@ -1,0 +1,28 @@
+The user has provided their C++ solution to a competitive programming problem (LeetCode/Codeforces style), along with the problem statement and the result they obtained.
+
+Problem Statement:
+[INSERT PROBLEM STATEMENT HERE]
+
+User Source Code (C++):
+[INSERT USER CODE HERE]
+
+Your job is to produce a short, structured code review with the following format:
+
+1. Flaws – Bullet points listing the main problems in the code. Focus on correctness, algorithmic efficiency (time/space complexity), readability, maintainability, and potential edge case handling. Keep each point short and clear.
+2. Improvements – A numbered list of practical steps the user can take to fix the flaws or optimize the solution.
+3. LINKS – On a new line, write LINKS, then list at most 3 high-quality links to resources that explain the concepts in the improvements section.
+
+Tone: Be constructive, clear, and concise. Avoid over-explaining; aim for under 150 words total.
+
+Example Output:
+Flaws:
+- Time complexity is O(n^2), which will cause TLE on large inputs.
+- Does not handle the case when the input array is empty.
+
+Improvements:
+1. Replace the nested loop with a hash map to reduce complexity to O(n).
+2. Add a check for empty input before processing.
+
+LINKS
+https://en.cppreference.com/w/cpp/container/unordered_map
+https://cp-algorithms.com/
