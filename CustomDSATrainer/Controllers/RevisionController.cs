@@ -1,14 +1,19 @@
-﻿using CustomDSATrainer.Domain;
+﻿using Asp.Versioning;
+using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.ApiResponse;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CustomDSATrainer.Controllers
 {
     /// <summary>
     /// A controller that selects a random <see cref="Problem"/> for revision.
     /// </summary>
+    [ApiVersion(1)]
     [ApiController]
-    [Route("api/revision")]
+    [Route("api/v{v:apiVersion}/revision")]
+    [EnableRateLimiting("Fixed")]
     public class RevisionController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
@@ -19,6 +24,7 @@ namespace CustomDSATrainer.Controllers
             _problemService = problemService                    ?? throw new ArgumentNullException(nameof(problemService), "ProblemService cannot be null.");
         }
 
+        [MapToApiVersion(1)]
         [HttpPost]
         public async Task<IActionResult> Revision()
         {
@@ -28,7 +34,13 @@ namespace CustomDSATrainer.Controllers
             {
                 await _problemService.LoadProblem(problem.Id);
 
-                return Ok($"Selected problem with id: {problem.Id} for revision");
+                return Ok(new RevisionDTO
+                {
+                    ProblemId = problem.Id,
+                    ProblemTitle = problem.Title ?? "",
+                    ProblemStatement = problem.Statement ?? "",
+                    SelectedAt = DateTime.Now.Date
+                });
             }
             return NotFound("Error finding a problem");
         }

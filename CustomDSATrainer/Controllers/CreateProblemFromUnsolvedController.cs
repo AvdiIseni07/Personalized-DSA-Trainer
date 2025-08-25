@@ -1,14 +1,18 @@
-﻿using CustomDSATrainer.Domain;
+﻿using Asp.Versioning;
+using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.ApiResponse;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace CustomDSATrainer.Controllers
 {
     /// <summary>
     /// A controller to generate a <see cref="Problem"/> from the unsolved ones.
     /// </summary>
+    [ApiVersion(1)]
     [ApiController]
-    [Route("api/problem-from-unsolved")]
+    [Route("api/v{v:apiVersion}/problem-from-unsolved")]
     public class CreateProblemFromUnsolvedController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
@@ -17,15 +21,22 @@ namespace CustomDSATrainer.Controllers
             _problemGeneratorService = problemGeneratorService ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
         }
 
+        [MapToApiVersion(1)]
         [HttpPost]
         public async Task<IActionResult> CreateProblemFromUnsolved()
         {
             Problem? problem = await _problemGeneratorService.GenerateProblemFromUnsolved();
 
-            if (problem != null)
-                return Ok($"Generated problem with id {problem.Id}.");
+            if (problem == null)
+                return BadRequest();
             else
-                return BadRequest("Could not generate a problem.");
+                return Ok(new ProblemDTO
+                {
+                    Id = problem.Id,
+                    Title = problem.Title ?? "",
+                    Statement = problem.Statement ?? "",
+                    CreatedAt = DateTime.Now,
+                });
         }
     }
 }

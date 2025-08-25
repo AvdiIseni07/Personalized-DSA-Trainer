@@ -1,6 +1,6 @@
 ﻿using CustomDSATrainer.Application.Services;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
-using CustomDSATrainer.Domain.UnitOfWork;
+using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Persistance;
 using CustomDSATrainer.Persistance.Repositories;
 using Microsoft.EntityFrameworkCore;

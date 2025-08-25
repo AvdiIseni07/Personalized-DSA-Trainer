@@ -1,8 +1,11 @@
-﻿using CustomDSATrainer.Domain;
+﻿using Asp.Versioning;
+using CustomDSATrainer.Domain;
+using CustomDSATrainer.Domain.ApiResponse;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Persistance;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomDSATrainer.Controllers
@@ -10,8 +13,10 @@ namespace CustomDSATrainer.Controllers
     /// <summary>
     /// A controller that loads a <see cref="Problem"/> based on the given ID.
     /// </summary>
+    [ApiVersion(1)]
     [ApiController]
-    [Route("api/load-problem")]
+    [Route("api/v{v:apiVersion}/load-problem")]
+    [EnableRateLimiting("Fixed")]
     public class LoadProblemController : ControllerBase
     {
         private readonly IProblemService _problemService;
@@ -24,13 +29,20 @@ namespace CustomDSATrainer.Controllers
             _currentActiveProblemService = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
         }
 
+        [MapToApiVersion(1)]
         [HttpPost("{ProblemId}")]
         public IActionResult LoadProblem(int ProblemId)
         {
             _problemService.LoadProblem(ProblemId);
 
             if (_currentActiveProblemService.CurrentProblem != null)
-                return Ok($"The following problem was retrieved succesfully.\n\n{_currentActiveProblemService.CurrentProblem.Statement}");
+                return Ok(new ProblemDTO
+                {
+                    Id = ProblemId,
+                    Title = _currentActiveProblemService.CurrentProblem.Title ?? "",
+                    Statement = _currentActiveProblemService.CurrentProblem.Statement ?? "",
+                    CreatedAt = DateTime.Now.Date
+                });
 
             return NotFound($"Problem with id: {ProblemId} was not found.");
         }

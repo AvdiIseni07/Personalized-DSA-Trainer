@@ -2,7 +2,7 @@
 using CustomDSATrainer.Persistance;
 using Microsoft.EntityFrameworkCore;
 
-namespace CustomDSATrainer.Domain.UnitOfWork
+namespace CustomDSATrainer.Domain.Interfaces.UnitOfWork
 {
     public interface IUnitOfWork
     {

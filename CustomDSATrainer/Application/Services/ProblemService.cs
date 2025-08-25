@@ -2,7 +2,7 @@
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
-using CustomDSATrainer.Domain.UnitOfWork;
+using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
 using CustomDSATrainer.Persistence.UnitOfWork;
 using FluentValidation.Results;

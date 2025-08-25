@@ -1,7 +1,7 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
-using CustomDSATrainer.Domain.UnitOfWork;
+using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using System.Threading.Tasks;
 
 namespace CustomDSATrainer.Application.Services
