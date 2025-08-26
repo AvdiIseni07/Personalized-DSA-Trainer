@@ -20,12 +20,12 @@ builder.Services.AddSingleton<DatabaseService>();
 builder.Services.AddSingleton<ISeedingService, SeedingService>();
 builder.Services.AddSingleton<ICurrentActiveProblemService, CurrentActiveProblemService>();
 builder.Services.AddSingleton<ICurrentUserProgress, CurrentUserProgressService>();
+builder.Services.AddSingleton<IUserOutputService, UserOutputService>();
 
 builder.Services.AddTransient<ISubmissionService, SubmissionService>();
 builder.Services.AddTransient<IAIReviewService, AIReviewService>();
 builder.Services.AddTransient<ITestCaseService, TestCaseService>();
 builder.Services.AddTransient<IUserSourceLinkerService, UserSourceLinkerService>();
-builder.Services.AddTransient<IUserOutputService, UserOutputService>();
 builder.Services.AddTransient<IPythonAIService, PythonAIService>();
 builder.Services.AddTransient<IActivityLogService, ActivityLogService>();
 builder.Services.AddTransient<IProblemGeneratorService, ProblemGeneratorService>();

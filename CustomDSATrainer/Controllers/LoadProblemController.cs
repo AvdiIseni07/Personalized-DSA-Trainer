@@ -41,7 +41,7 @@ namespace CustomDSATrainer.Controllers
                     Id = ProblemId,
                     Title = _currentActiveProblemService.CurrentProblem.Title ?? "",
                     Statement = _currentActiveProblemService.CurrentProblem.Statement ?? "",
-                    CreatedAt = DateTime.Now.Date
+                    CreatedAt = DateTime.Now
                 });
 
             return NotFound($"Problem with id: {ProblemId} was not found.");

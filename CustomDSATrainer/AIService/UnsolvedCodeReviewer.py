@@ -19,7 +19,7 @@ parts = all_input.split("----------")
 problemStatement = parts[0];
 userSource = parts[1]
 
-lines = question.splitlines
+lines = question.splitlines()
 
 lines[3] = problemStatement
 lines[6] = userSource
@@ -32,4 +32,4 @@ response = client.models.generate_content(
 )
 
 text = response.text
-print(text)
+print(text, flush = True)

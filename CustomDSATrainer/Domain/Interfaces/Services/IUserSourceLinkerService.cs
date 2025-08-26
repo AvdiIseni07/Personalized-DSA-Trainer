@@ -4,6 +4,6 @@ namespace CustomDSATrainer.Domain.Interfaces.Services
 {
     public interface IUserSourceLinkerService
     {
-        TestCaseVerdict RunCppExecutable(TestCase testCase);
+        Task<TestCaseVerdict> RunCppExecutable(TestCase testCase);
     }
 }

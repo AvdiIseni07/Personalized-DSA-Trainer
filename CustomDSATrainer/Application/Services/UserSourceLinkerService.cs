@@ -25,7 +25,7 @@ namespace CustomDSATrainer.Application.Services
         /// </summary>
         /// <param name="testCase">The <see cref="TestCase"/> that needs to be ran.</param>
         /// <returns>A <see cref="TestCaseVerdict"/> that tells whether the code exceeded the time or memory limits.</returns>
-        public TestCaseVerdict RunCppExecutable(TestCase testCase)
+        public async Task<TestCaseVerdict> RunCppExecutable(TestCase testCase)
         {
             TestCaseVerdict currentVerdict = TestCaseVerdict.Passed;
             var startInfo = new ProcessStartInfo
@@ -85,7 +85,7 @@ namespace CustomDSATrainer.Application.Services
                 });
                 monitorThread.Start();
                 
-                string output = process.StandardOutput.ReadToEnd();
+                string output = await process.StandardOutput.ReadToEndAsync();
 
                 process.WaitForExit();
 

@@ -6,11 +6,11 @@ namespace CustomDSATrainer.Domain.Validators
     {
         public TestCaseValidator()
         {
-            RuleFor(testCase => testCase.Id).NotEmpty();
-            RuleFor(testCase => testCase.SubmissionId).NotEmpty();
+            RuleFor(testCase => testCase.Id).NotNull();
+            RuleFor(testCase => testCase.SubmissionId).NotNull();
             RuleFor(testCase => testCase.Verdict).IsInEnum();
-            RuleFor(testCase => testCase.Input).NotEmpty();
-            RuleFor(testCase => testCase.ExpectedOutput).NotEmpty();
+            RuleFor(testCase => testCase.Input).NotNull();
+            RuleFor(testCase => testCase.ExpectedOutput).NotNull();
         }
     }
 }

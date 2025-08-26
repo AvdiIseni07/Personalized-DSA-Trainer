@@ -29,16 +29,16 @@ namespace CustomDSATrainer.Application.Services
         private readonly ILogger<ProblemService> _logger;
 
         public ProblemService(
-            ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService, 
+            ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService,
             IUnitOfWork unitOfWork, ILogger<ProblemService> logger)
         {
-            _submissionService = submissionService                      ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
-            _currentActiveProblemService = currentActiveProblemService  ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
-            _pythonAIService = pythonAIService                          ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
-            _unitOfWork = unitOfWork                                    ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
-            _logger = logger                                            ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
+            _submissionService = submissionService ?? throw new ArgumentNullException(nameof(submissionService), "Submission service cannot be null.");
+            _currentActiveProblemService = currentActiveProblemService ?? throw new ArgumentNullException(nameof(currentActiveProblemService), "CurrentActiveProblemService cannot be null.");
+            _pythonAIService = pythonAIService ?? throw new ArgumentNullException(nameof(pythonAIService), "PythonAIService cannot be null.");
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null");
         }
-        
+
         /// <summary>
         /// Submits a user-generated executable to be tested for the selected problem.
         /// The executable will run through all the test cases. It will have a custom I/O stream from where it will be given the input.
@@ -55,7 +55,7 @@ namespace CustomDSATrainer.Application.Services
             if (problem == null) { throw new ArgumentNullException(nameof(problem), "Problem cannot be null."); }
             _logger.LogInformation("Submitting problem with ID: {ProblemId}", problem.Id);
 
-            Submission submission = new Submission { ProblemId = problem.Id, Id = 0, PathToExecutable = pathToExe };
+            Submission submission = new Submission { Id = 0, ProblemId = problem.Id, PathToExecutable = pathToExe };
 
             SubmissionValidator validator = new SubmissionValidator();
             ValidationResult validationResult = validator.Validate(submission);
@@ -64,13 +64,21 @@ namespace CustomDSATrainer.Application.Services
             {
                 throw new Exception(validationResult.Errors.ToArray().ToString());
             }
-
+            _submissionService.SaveToDatabase(submission);
             _submissionService.RunSumbission(submission, problem.Inputs, problem.Outputs);
             _submissionService.SaveToDatabase(submission);
-            
+
+            if (problem.Status != ProblemStatus.Solved)
+            {
+                if (submission.Result == SubmissionResult.Success)
+                    problem.Status = ProblemStatus.Solved;
+                else
+                    problem.Status = ProblemStatus.Unsolved;
+            }
+
             _logger.LogInformation("Problem {ProblemId} was submitted susccessfully.", problem.Id);
         }
-        
+
         /// <summary>
         /// Gets a <see cref="Problem"/> from the database based on the given id and loads it.
         /// If it is loaded successfully the user will be able to submit an executable for this problem.
@@ -135,9 +143,7 @@ namespace CustomDSATrainer.Application.Services
             try
             {
                 string userSource = File.ReadAllText(Path.GetFullPath(pathToSource));
-                currentReview.Review = _pythonAIService.ReviewProblem(problem.Statement!, userSource, problem.Status == ProblemStatus.Solved) ?? "Failed to generate review";
-
-                _logger.LogInformation("Successfully created AI Review ({ReviewId}) for problem {ProblemId}", currentReview.Id, problem.Id);
+                currentReview.Review = await _pythonAIService.ReviewProblem(problem.Statement!, userSource, problem.Status == ProblemStatus.Solved) ?? "Failed to generate review";
 
                 await _unitOfWork.BeginTransactionAsync();
                 try
@@ -145,6 +151,8 @@ namespace CustomDSATrainer.Application.Services
                     _unitOfWork.AIReviewRepository.SaveToDatabase(currentReview);
                     await _unitOfWork.CommitAsync();
                     await _unitOfWork.CommitTransactionAsync();
+
+                    _logger.LogInformation("Successfully created AI Review ({ReviewId}) for problem {ProblemId}", currentReview.Id, problem.Id);
                 }
                 catch { await _unitOfWork.RollbackTransactionAsync(); }
             }

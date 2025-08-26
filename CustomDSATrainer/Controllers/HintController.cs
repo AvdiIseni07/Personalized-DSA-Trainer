@@ -35,7 +35,7 @@ namespace CustomDSATrainer.Controllers
             return Ok(new HintDTO
             {
                 Hint = currentProblem.Hint ?? "",
-                RevealedAt = DateTime.Now.Date
+                RevealedAt = DateTime.Now
             });
         }
     }

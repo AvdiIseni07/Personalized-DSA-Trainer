@@ -39,10 +39,10 @@ namespace CustomDSATrainer.Controllers
 
             string review = await _problemService.AiReview(currentProblem, SourceCodePath) ?? "";
 
-            if (!review.IsNullOrEmpty()) return Ok(new AIReviewDTO
+            if (review != "") return Ok(new AIReviewDTO
             {
                 Review = review,
-                CreatedAt = DateTime.Now.Date
+                CreatedAt = DateTime.Now
             });
 
             return BadRequest("Error generating review");

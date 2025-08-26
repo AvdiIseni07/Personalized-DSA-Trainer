@@ -34,7 +34,7 @@ namespace CustomDSATrainer.Controllers
                     Id = problem.Id,
                     Title = problem.Title ?? "",
                     Statement = problem.Statement ?? "",
-                    CreatedAt = DateTime.Now.Date,
+                    CreatedAt = DateTime.Now,
                 });
             else
                 return BadRequest("Problem could not be generated.");

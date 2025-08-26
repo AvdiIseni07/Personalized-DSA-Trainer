@@ -13,6 +13,7 @@ namespace CustomDSATrainer.Domain
         public ProblemStatus Status { get; set; } = ProblemStatus.NotTried;
         public string Inputs { get; set; } = string.Empty;
         public string Outputs { get; set; } = string.Empty;
+        public DateTime GeneratedAt { get; set; }
       
         public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
         public ICollection<AIReview> AIReviews { get; set; } = new List<AIReview>();

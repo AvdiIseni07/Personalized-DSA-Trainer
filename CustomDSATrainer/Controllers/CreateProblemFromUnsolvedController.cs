@@ -16,19 +16,20 @@ namespace CustomDSATrainer.Controllers
     public class CreateProblemFromUnsolvedController : ControllerBase
     {
         private readonly IProblemGeneratorService _problemGeneratorService;
+        
         public CreateProblemFromUnsolvedController(IProblemGeneratorService problemGeneratorService)
         {
             _problemGeneratorService = problemGeneratorService ?? throw new ArgumentNullException(nameof(problemGeneratorService), "ProblemGeneratorService cannot be null.");
         }
 
         [MapToApiVersion(1)]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> CreateProblemFromUnsolved()
         {
             Problem? problem = await _problemGeneratorService.GenerateProblemFromUnsolved();
 
             if (problem == null)
-                return BadRequest();
+                return BadRequest("No unsolved problems.");
             else
                 return Ok(new ProblemDTO
                 {

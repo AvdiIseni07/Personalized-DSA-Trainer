@@ -39,7 +39,7 @@ namespace CustomDSATrainer.Controllers
                     ProblemId = problem.Id,
                     ProblemTitle = problem.Title ?? "",
                     ProblemStatement = problem.Statement ?? "",
-                    SelectedAt = DateTime.Now.Date
+                    SelectedAt = DateTime.Now
                 });
             }
             else

@@ -6,6 +6,7 @@ using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System.Numerics;
 using System.Threading.Tasks;
 namespace CustomDSATrainer.Application.Services
@@ -18,10 +19,13 @@ namespace CustomDSATrainer.Application.Services
         private readonly ITestCaseService _testCaseService;
         private readonly IUnitOfWork _unitOfWork;
         private const int TEST_CASE_AMOUNT = 7;
-        public SubmissionService(ITestCaseService testCaseService, IUnitOfWork unitOfWork)
+        private readonly ILogger<SubmissionService> _logger;
+
+        public SubmissionService(ITestCaseService testCaseService, IUnitOfWork unitOfWork, ILogger<SubmissionService> logger)
         {
-            _testCaseService = testCaseService              ?? throw new ArgumentNullException(nameof(testCaseService), "TestCaseService cannot be null.");
-            _unitOfWork = unitOfWork                        ?? throw new ArgumentNullException(nameof(unitOfWork), "SubmissionRepository cannot be null");
+            _testCaseService = testCaseService  ?? throw new ArgumentNullException(nameof(testCaseService), "TestCaseService cannot be null.");
+            _unitOfWork = unitOfWork            ?? throw new ArgumentNullException(nameof(unitOfWork), "SubmissionRepository cannot be null");
+            _logger = logger                    ?? throw new ArgumentNullException(nameof(logger), "Logger cannot be null.");
         }
         
         /// <summary>
@@ -32,7 +36,7 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="_inputs">The inputs for the test case.</param>
         /// <param name="_outputs">The expected outputs for the test case.</param>
         /// <exception cref="Exception">The validator has deemed that the <see cref="TestCase"/> hasn't been initialized correctly.</exception>
-        public void RunSumbission(Submission submission, string _inputs, string _outputs)
+        public async void RunSumbission(Submission submission, string _inputs, string _outputs)
         {
             submission.Result = SubmissionResult.Success;
 
@@ -41,6 +45,7 @@ namespace CustomDSATrainer.Application.Services
 
             for (int i = 0; i < TEST_CASE_AMOUNT; i++)
             {
+                _logger.LogInformation("Running testcase {TestCase}", i + 1);
                 var testCase = new TestCase
                 {
                     Id = 0,
@@ -58,8 +63,8 @@ namespace CustomDSATrainer.Application.Services
                     throw new Exception(result.Errors.ToArray().ToString());
                 }
 
-                TestCaseVerdict verdict = _testCaseService.InitTestCase(testCase);
-                _testCaseService.SaveToDatabase(testCase);
+                TestCaseVerdict verdict = await _testCaseService.InitTestCase(testCase);
+                await _testCaseService.SaveToDatabase(testCase);
 
                 if (verdict == TestCaseVerdict.TimeLimitExceeded)
                 {

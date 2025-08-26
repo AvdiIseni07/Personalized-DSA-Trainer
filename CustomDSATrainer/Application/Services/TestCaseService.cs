@@ -20,11 +20,13 @@ namespace CustomDSATrainer.Application.Services
         private IUserOutputService _userOutputService;
         private readonly IUserSourceLinkerService _userSourceLinkerService;
         private readonly IUnitOfWork _unitOfWork;
-        public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, IUnitOfWork unitOfWork)
+        private readonly ILogger<TestCaseService> _logger;
+        public TestCaseService(IUserOutputService userOutputService, IUserSourceLinkerService userSourceLinkerService, IUnitOfWork unitOfWork, ILogger<TestCaseService> logger)
         {
-            _userOutputService = userOutputService              ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
-            _userSourceLinkerService = userSourceLinkerService  ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");
-            _unitOfWork = unitOfWork                           ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
+            _userOutputService = userOutputService ?? throw new ArgumentNullException(nameof(userOutputService), "UserOutputService cannot be null.");
+            _userSourceLinkerService = userSourceLinkerService ?? throw new ArgumentNullException(nameof(userSourceLinkerService), "UserSourceLinkerService cannot be null.");
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork), "UnitOfWork cannot be null.");
+            _logger = logger;
         }
 
         /// <summary>
@@ -35,13 +37,16 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="testCase">The test case to be initialized.</param>
         /// <returns>A <see cref="TestCaseVerdict"/> based on the results of the initialization.</returns>
         /// <exception cref="ArgumentNullException">The test case isn't loaded corrrectly (is null).</exception>
-        public TestCaseVerdict InitTestCase(TestCase testCase)
+        public async Task<TestCaseVerdict> InitTestCase(TestCase testCase)
         {
             if (testCase == null) throw new ArgumentNullException(nameof(testCase), "Test case cannot be null.");
-            testCase.Verdict = _userSourceLinkerService.RunCppExecutable(testCase);
+            testCase.Verdict = await _userSourceLinkerService.RunCppExecutable(testCase);
 
             if (testCase.Verdict == TestCaseVerdict.Passed)
+            {
+                _logger.LogCritical("Code passed time and memory limit tests.");
                 testCase.Verdict = RunTest(testCase.ExpectedOutput);
+            }
 
             return testCase.Verdict;
         }
@@ -61,12 +66,14 @@ namespace CustomDSATrainer.Application.Services
             if (userOutput.Length < expectedOutput.Length)
             {
                 verdict = TestCaseVerdict.TooFewArguments;
+                _logger.LogCritical("Too few arguments printed out. {user} vs {expected}, {userOut}", userOutput.Length, expectedOutput.Length, _userOutputService.UserOutput);
                 return verdict;
             }
 
             if (userOutput.Length > expectedOutput.Length)
             {
                 verdict = TestCaseVerdict.TooManyArguments;
+                _logger.LogCritical("Too many arguments printed out. {user} vs {expected}", userOutput.Length, expectedOutput.Length);
                 return verdict;
             }
 
@@ -75,9 +82,12 @@ namespace CustomDSATrainer.Application.Services
                 if (userOutput[i] != expectedOutput[i])
                 {
                     verdict = TestCaseVerdict.IncorrectAnswer;
+                    _logger.LogCritical("Incorrect answer printed out.");
                     break;
                 }
             }
+
+            _logger.LogCritical("Code passed output comparison");
 
             return verdict;
         }

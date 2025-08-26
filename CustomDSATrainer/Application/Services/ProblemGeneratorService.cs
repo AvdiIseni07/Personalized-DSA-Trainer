@@ -4,6 +4,7 @@ using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
 using FluentValidation.Results;
+using Microsoft.VisualBasic;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -63,7 +64,8 @@ namespace CustomDSATrainer.Application.Services
                 Categories = categories,
                 Hint = hint,
                 Inputs = inputs,
-                Outputs = outputs
+                Outputs = outputs,
+                GeneratedAt = DateTime.Now.Date
             };
 
             ProblemValidator validator = new ProblemValidator();
@@ -108,6 +110,9 @@ namespace CustomDSATrainer.Application.Services
             _logger.LogInformation("Generating problem from unsolved");
             Problem? generatedProblem = null;
             Tuple<string, string> data = await _unitOfWork.ProblemRepository.GetUnsolvedData();
+
+            if (data.Item1 == string.Empty || data.Item2 == string.Empty)
+                return null;
 
             List<string> problemData = _pythonAIService.GenerateProblemFromUnsolved(data.Item1, data.Item2);
             generatedProblem = InitProblem(problemData);

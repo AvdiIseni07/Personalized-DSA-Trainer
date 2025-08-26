@@ -6,9 +6,9 @@ namespace CustomDSATrainer.Domain.Validators
     {
         public SubmissionValidator()
         {
-            RuleFor(submission => submission.Id).NotEmpty();
-            RuleFor(submission => submission.PathToExecutable).NotEmpty();
-            RuleFor(submission => submission.ProblemId).NotEmpty();
+            RuleFor(submission => submission.Id).NotNull();
+            RuleFor(submission => submission.PathToExecutable).NotNull();
+            RuleFor(submission => submission.ProblemId).NotNull();
             RuleFor(submission => submission.Result).IsInEnum();
         }
     }

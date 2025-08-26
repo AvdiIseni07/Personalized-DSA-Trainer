@@ -3,7 +3,7 @@ using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
 using CustomDSATrainer.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-
+using System.Diagnostics;
 
 namespace CustomDSATrainer.Persistance.Repositories
 {
@@ -34,13 +34,79 @@ namespace CustomDSATrainer.Persistance.Repositories
             return problem;
         }
 
-        public async Task<List<int>> GetFromSearch(string query)
+        /// <summary>
+        /// Gives functionality for pagination search for the problems.
+        /// 
+        /// For the time range feature:
+        /// <list type="bullet">
+        /// <item>If only the lowerbound is given, it will return all problems generated after the given time.</item>
+        /// <item>If only the upperbound is giben, it will return all problems generated before the given time.</item>
+        /// <item>If both lower and upper bound are given, it will return all problems generated within the given timeframe</item>
+        /// <item><b>All timeframes are inclusive.</b></item>
+        /// </list>
+        /// </summary>
+        /// <param name="searchString">What is searched in the title and statement.</param>
+        /// <param name="categories">The categories the problem should have.</param>
+        /// <param name="difficulty">The difficulty the problem should be.</param>
+        /// <param name="status">The status the problem should be.</param>
+        /// <param name="pageNumber">The page number requested.</param>
+        /// <param name="pageSize">The page size requested.</param>
+        /// <param name="dateLowerBound">Lowerbound for time range.</param>
+        /// <param name="dateUpperBound">Upperbound for time range.</param>
+        /// <param name="sortOption">How to sort the given result.</param>
+        /// <returns>Returns a <see cref="PaginatedList{T}"/> containing all the problems that fit the search query.</returns>
+        public async Task<PaginatedList<Problem>> GetPages(string? searchString, string? categories, string? difficulty, ProblemStatus? status,
+                                                            int? pageNumber, int? pageSize, DateTime? dateLowerBound, DateTime? dateUpperBound, SortOption sortOption)
         {
-            List<int> results = await _context.Problem.Where(p => p.Title.Contains(query) || p.Statement.Contains(query))
-                .OrderBy(p => p.Difficulty == "Easy" ? 1 : p.Difficulty == "Medium" ? 2 : p.Difficulty == "Hard" ? 3 : 4)
-                .Select(p => p.Id).ToListAsync();
+            var problems = _context.Problem.AsQueryable();
 
-            return results;
+            if (dateLowerBound != null && dateUpperBound != null)
+            {
+                problems = problems.Where(p => DateTime.Compare(p.GeneratedAt, (DateTime)dateLowerBound) >= 0 && DateTime.Compare(p.GeneratedAt, (DateTime)dateUpperBound) <= 0);
+            }
+            else if (dateLowerBound != null)
+            {
+                problems = problems.Where(p => DateTime.Compare(p.GeneratedAt, (DateTime)dateLowerBound) >= 0);
+            }
+            else if (dateUpperBound != null)
+            {
+                problems = problems.Where(p => DateTime.Compare(p.GeneratedAt, (DateTime)dateUpperBound) <= 0);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                problems = problems.Where(p => p.Title.Contains(searchString) || p.Statement.Contains(searchString));
+            }
+
+            if (!string.IsNullOrWhiteSpace(categories))
+            {
+                problems = problems.Where(p => p.Categories.ToLower().Contains(categories.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(difficulty))
+            {
+                problems = problems.Where(p => p.Difficulty.ToLower() == difficulty.ToLower());
+            }
+
+            if (status != null)
+            {
+                problems = problems.Where(p => p.Status == status);
+            }
+
+            if (sortOption == SortOption.Status)
+            {
+                problems = problems.OrderBy(p => p.Status);
+            }
+            else if (sortOption == SortOption.Difficulty)
+            {
+                problems = problems.OrderBy(p => p.Difficulty == "hard" ? 1 : p.Difficulty == "medium" ? 2 : p.Difficulty == "easy" ? 3 : 4);
+            }
+            else if (sortOption == SortOption.GeneratedTime)
+            {
+                problems = problems.OrderBy(p => p.GeneratedAt);
+            }
+
+            return await PaginatedList<Problem>.CreateAsync(problems.AsNoTracking(), pageNumber ?? 1, pageSize ?? 10);
         }
 
         /// <summary>

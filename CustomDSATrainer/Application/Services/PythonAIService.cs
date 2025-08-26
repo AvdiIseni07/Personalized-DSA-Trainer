@@ -40,6 +40,7 @@ namespace CustomDSATrainer.Application.Services
         /// <returns>The <see cref="ProcessStartInfo"/> for the given script.</returns>
         private ProcessStartInfo GetStartInfo(string script)
         {
+            _logger.LogTrace("Getting start info for {pathToScript}", script);
             var startInfo = new ProcessStartInfo
             {
                 FileName = "python",
@@ -136,11 +137,11 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="userSource">The user-generated source code.</param>
         /// <param name="solved">Whether the selected problem has been solved or not.</param>
         /// <returns>The generated review for the given problem and source code.</returns>
-        public string? ReviewProblem(string problemStatement, string userSource, bool solved)
+        public async Task<string?> ReviewProblem(string problemStatement, string userSource, bool solved)
         {
             ProcessStartInfo startInfo = solved ? GetStartInfo(_pathToPythonSolvedReview) : GetStartInfo(_pathToPythonUnsolvedReview);
 
-            string? review = null;
+            string? review = string.Empty;
             try
             {
                 using (var process = new Process { StartInfo = startInfo })
@@ -158,12 +159,13 @@ namespace CustomDSATrainer.Application.Services
                         throw new TimeoutException($"Review timed out after {TIMEOUT_LIMIT} milliseconds.");
                     }
 
-                    review = process.StandardOutput.ReadToEnd();
+                    review = await process.StandardOutput.ReadToEndAsync();
 
-                    process.WaitForExit();
+                    await process.WaitForExitAsync();
                 }
             } catch (TimeoutException e){ _logger.LogError(e, "Review time out."); }
-            
+
+            _logger.LogCritical("Review is {rev}.", review);
 
             return review;
         }
