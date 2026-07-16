@@ -208,7 +208,7 @@ namespace CustomDSATrainer.Persistance.Repositories
         {
             Problem? problem = null;
 
-            var results = await _context.Problem.Where(p => p.Categories.Contains(categories)).ToListAsync();
+            var results = await _context.Problem.Where(p => p.Status == ProblemStatus.Solved).Where(p => p.Categories.Contains(categories)).ToListAsync();
 
             if (results.Count > 0)
             {

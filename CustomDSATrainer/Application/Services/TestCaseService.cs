@@ -101,8 +101,7 @@ namespace CustomDSATrainer.Application.Services
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                
-                _unitOfWork.TestCaseRepository.SaveToDatabase(testCase);
+                await _unitOfWork.TestCaseRepository.SaveToDatabase(testCase);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
             }

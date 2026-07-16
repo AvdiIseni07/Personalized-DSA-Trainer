@@ -60,6 +60,7 @@ namespace CustomDSATrainer.Controllers
             try
             {
                 await _unitOfWork.SearchRepository.SaveToDatabase(search);
+                await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
             } catch { await _unitOfWork.RollbackTransactionAsync(); }
 

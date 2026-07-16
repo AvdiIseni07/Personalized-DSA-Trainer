@@ -1,12 +1,11 @@
 ﻿using CustomDSATrainer.Domain;
 using CustomDSATrainer.Domain.Enums;
-using CustomDSATrainer.Domain.Interfaces.Repositories;
 using CustomDSATrainer.Domain.Interfaces.Services;
 using CustomDSATrainer.Domain.Interfaces.UnitOfWork;
 using CustomDSATrainer.Domain.Validators;
-using CustomDSATrainer.Persistence.UnitOfWork;
+using CustomDSATrainer.Persistance;
 using FluentValidation.Results;
-using System.Runtime.InteropServices.Marshalling;
+using System.Data.Entity.Infrastructure;
 
 namespace CustomDSATrainer.Application.Services
 {
@@ -27,7 +26,6 @@ namespace CustomDSATrainer.Application.Services
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly ILogger<ProblemService> _logger;
-
         public ProblemService(
             ISubmissionService submissionService, ICurrentActiveProblemService currentActiveProblemService, IPythonAIService pythonAIService,
             IUnitOfWork unitOfWork, ILogger<ProblemService> logger)
@@ -50,7 +48,7 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="pathToExe">The path to the user executable</param>
         /// <exception cref="ArgumentNullException">The problem has not been loaded correctly (is null).</exception>
         /// <exception cref="Exception">The validator has deemed that the <see cref="Submission"/> hasn't been initialized correctly.</exception>
-        public void SubmitProblem(Problem problem, string pathToExe)
+        public async Task SubmitProblem(Problem problem, string pathToExe)
         {
             if (problem == null) { throw new ArgumentNullException(nameof(problem), "Problem cannot be null."); }
             _logger.LogInformation("Submitting problem with ID: {ProblemId}", problem.Id);
@@ -64,9 +62,9 @@ namespace CustomDSATrainer.Application.Services
             {
                 throw new Exception(validationResult.Errors.ToArray().ToString());
             }
-            _submissionService.SaveToDatabase(submission);
+            await _submissionService.SaveToDatabase(submission);
             _submissionService.RunSumbission(submission, problem.Inputs, problem.Outputs);
-            _submissionService.SaveToDatabase(submission);
+            await _submissionService.SaveToDatabase(submission);
 
             if (problem.Status != ProblemStatus.Solved)
             {
@@ -75,6 +73,8 @@ namespace CustomDSATrainer.Application.Services
                 else
                     problem.Status = ProblemStatus.Unsolved;
             }
+
+            try { await SaveToDatabase(problem); } catch { }
 
             _logger.LogInformation("Problem {ProblemId} was submitted susccessfully.", problem.Id);
         }
@@ -120,7 +120,7 @@ namespace CustomDSATrainer.Application.Services
         }
 
         /// <summary>
-        /// Generates an <see cref="AIReview"/> for a given problem. 
+        /// Generates an <see cref="AIReview"/> for a given problem.
         /// It will analyze the user source code and it will give an appropriate review.
         /// </summary>
         /// <param name="problem">The selected <see cref="Problem"/>.</param>
@@ -148,7 +148,7 @@ namespace CustomDSATrainer.Application.Services
                 await _unitOfWork.BeginTransactionAsync();
                 try
                 {
-                    _unitOfWork.AIReviewRepository.SaveToDatabase(currentReview);
+                    await _unitOfWork.AIReviewRepository.SaveToDatabase(currentReview);
                     await _unitOfWork.CommitAsync();
                     await _unitOfWork.CommitTransactionAsync();
 
@@ -170,11 +170,11 @@ namespace CustomDSATrainer.Application.Services
         /// <param name="problem">The <see cref="Problem"/> that should be saved.</param>
         public async Task SaveToDatabase(Problem problem)
         {
-            await _unitOfWork.BeginTransactionAsync();
+            //await _unitOfWork.BeginTransactionAsync();
             try
             {
                 _unitOfWork.ProblemRepository.SaveToDatabase(problem);
-                await _unitOfWork.CommitAsync();
+                //await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
             }
             catch { await _unitOfWork.RollbackTransactionAsync(); }

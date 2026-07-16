@@ -32,6 +32,7 @@ namespace CustomDSATrainer.Controllers
         {
             if (_currentActiveProblemService.CurrentProblem == null) return BadRequest("There is no problem loaded.");
             _problemService.SubmitProblem(_currentActiveProblemService.CurrentProblem, ExePath);
+            _problemService.SaveToDatabase(_currentActiveProblemService.CurrentProblem);
 
             return Ok(new TestDTO
             {

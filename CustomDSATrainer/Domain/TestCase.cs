@@ -21,6 +21,6 @@ namespace CustomDSATrainer.Domain
             Input = input;
             TimeLimit = timeLimit;
             MemoryLimit = memoryLimit;
-        }        
+        }
     }
 }

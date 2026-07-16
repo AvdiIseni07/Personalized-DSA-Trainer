@@ -2,6 +2,6 @@
 {
     public interface ITestCaseRepository
     {
-        void SaveToDatabase(TestCase testCase);
+        Task SaveToDatabase(TestCase testCase);
     }
 }

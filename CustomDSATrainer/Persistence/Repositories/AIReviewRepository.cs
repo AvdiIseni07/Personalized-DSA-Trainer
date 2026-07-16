@@ -20,7 +20,7 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// If it already exists, it only updates the values.
         /// </summary>
         /// <param name="aiReview">The AIReview that needs to be saved.</param>
-        public async void SaveToDatabase(AIReview aiReview)
+        public async Task SaveToDatabase(AIReview aiReview)
         {
             var existingReview = await _context.AIReview.FindAsync(aiReview.Id);
 

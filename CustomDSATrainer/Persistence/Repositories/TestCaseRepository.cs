@@ -20,7 +20,7 @@ namespace CustomDSATrainer.Persistance.Repositories
         /// If it already exists, it only updates the values.
         /// </summary>
         /// <param name="testCase">The <see cref="TestCase"/> that needs to be saved.</param>
-        public async void SaveToDatabase(TestCase testCase)
+        public async Task SaveToDatabase(TestCase testCase)
         {
             var existingTestCase = await _context.TestCase.FindAsync(testCase.Id);
 
