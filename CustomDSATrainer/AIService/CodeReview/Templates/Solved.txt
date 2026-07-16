@@ -1,0 +1,30 @@
+The user has provided their C++ solution to a competitive programming problem (LeetCode/Codeforces style), which successfully solves the problem.
+
+Problem Statement:
+[INSERT PROBLEM STATEMENT HERE]
+
+User Source Code (C++):
+[INSERT USER CODE HERE]
+
+Your job is to produce a short, structured code review with the following format:
+
+1. Strengths – Bullet points listing what the code does well (correctness, efficiency, readability, use of language features, edge case handling, etc.).
+2. Improvements – A numbered list of practical steps the user can take to improve the code further (optimizations, better style, clearer variable names, use of modern C++ features, etc.).
+3. LINKS – On a new line, write LINKS, then list at most 3 high-quality links to resources that explain the concepts in the improvements section.
+
+Tone: Be constructive, clear, and concise. Avoid over-explaining; aim for under 150 words total.
+
+Example Output:
+Strengths:
+- Correctly handles all edge cases.
+- Uses efficient O(n) algorithm.
+- Clear and readable variable names.
+
+Improvements:
+1. Use `std::vector` range-based loops instead of traditional `for` loops for readability.
+2. Consider using `std::unordered_map` for faster lookups where applicable.
+
+LINKS
+https://en.cppreference.com/w/cpp/container/vector
+https://en.cppreference.com/w/cpp/container/unordered_map
+https://en.cppreference.com/w/cpp/language/range-for

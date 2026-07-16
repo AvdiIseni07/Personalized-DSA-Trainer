@@ -5,6 +5,9 @@
         NoVerdict,
         Passed,
         IncorrectAnswer,
-        TimeLimitExceeded
+        TimeLimitExceeded,
+        MemoryLimitExceeded,
+        TooManyArguments,
+        TooFewArguments
     }
 }

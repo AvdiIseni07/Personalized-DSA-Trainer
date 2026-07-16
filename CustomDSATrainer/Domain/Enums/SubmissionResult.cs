@@ -3,8 +3,11 @@
     public enum SubmissionResult
     {
         Success,
+        Failed,
         CompilationError,
         TimeLimitExceeded,
-        MemoryLimitExceeded
+        MemoryLimitExceeded,
+        FailedToLocateInput,
+        FailedToLocateOutput
     }
 }
